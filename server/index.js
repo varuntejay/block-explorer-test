@@ -1,6 +1,6 @@
 const express                       = require('express');
 const bodyParser                    = require('body-parser');
-const getBlocksHandler              = require('./src/handlers/getblockshandler');
+const ethHandler                    = require('./src/handlers/eth');
 
 const app               = express();
 const port              = process.env.PORT || 9086;
@@ -24,7 +24,7 @@ registerRoutes = () => {
         next();
     });
 
-    app.use('/getBlocks', getBlocksHandler);    
+    app.use('/eth', ethHandler);    
 }
 
 server = () => {

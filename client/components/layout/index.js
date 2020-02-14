@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Header from '../header';
 import Content from '../content';
+import Menubar from '../menubar';
 import './style.css'
 
 export default class Layout extends Component {
@@ -11,8 +12,9 @@ export default class Layout extends Component {
         return (
             <div style={{ height: '100%', margin: '-8px'}}>
                 <Header></Header>
-                <div className="content">
-                    <Content />
+                <Menubar></Menubar>
+                <div className="contentSection">
+                    {this.props.children}
                 </div>
             </div>
         )
