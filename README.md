@@ -1,13 +1,9 @@
-# fabric-block-explorer
-Hyperledger fabric custom block explorer built using React JS as client and Node JS as server
+# block-explorer
+block explorer built using React JS as client and Node JS as server
 
 ## **Prerequisites**
 
 1. Nodejs 10.x.x
-
-2. Fabric Network 
-
-3. Fabric Crypto material
     
 ## **Installation**
 
@@ -35,68 +31,11 @@ npm install
 
 ## **Configuration**
 
-1. Copy the peer TLS certificate from network crypto-config folder to the following directory
+In progress
 
-```
-./server/src/certs
-```
-E.g. peer TLS certificate path in fabric samples - first network is following
-
-```
-fabric-samples/first-network/crypto-config/peerOrganizations/org1.example.com/tlsca/tlsca.org1.example.com-cert.pem
-```
-
-2. Copy the user certificate registered either from fabric-ca tool or custom tool to the following directory
-
-```
-./server/src/certs/hfc
-```
-
-  - If User certificate available. Please update the following globalconfig file with username
-  
-  ```
-  ./server/src/globalconfig.js
-  module.exports.FABRIC_CLIENT_USERNAME = '{username}'
-  ```
-  
-  - If you don't have scripts to generate user certificates. Please follow the steps listed below.
-  
-    - Open the following file in a code/text editor
-    
-    ```
-    ./server/src/globalconfig.js
-    ```
-    - Edit the following configuration to point to the fabric CA
-    
-    ```
-    module.exports.FABRIC_CA_URL='http://localhost:7054'    
-    module.exports.FABRIC_CLIENT_USERNAME = 'user1'
-    ```
-    - Next run the following scripts one after another.
-    
-     ```
-     ./server/src/fabric_ca/enrolladmin.js
-     ./server/src/fabric_ca/enrollaffiliation.js
-     ./server/src/fabric_ca/registeruser.js
-     ```
-     - With the above steps, a user certificate will be created under the following directory.
-     
-     ```
-     ./server/src/certs/hfc
-     ```
- 3. Update the fabric configuration following global config file.
- 
- ```
-./server/src/globalconfig.js
-
-// 
-module.exports.FABRIC_CHANNEL_NAME = 'mychannel'
-module.exports.FABRIC_PEER_NAME = 'peer0.org1.example.com'    
-module.exports.FABRIC_PEER_ADDRESS = 'grpcs://localhost:7051'
- ```
 ## **Run node express back end server**
 
-1. First, ensure that you're in the fabric-block-explorer/server folder.
+1. First, ensure that you're in the block-explorer/server folder.
 
 2. Run the node express back end server in dev mode. This will up bring the express server on PORT 9086.
 
@@ -111,7 +50,7 @@ http://localhost:9086
 
 ## **Run react front end application**
 
-1. First, ensure that you're in the fabric-block-explorer/client folder.
+1. First, ensure that you're in the block-explorer/client folder.
 
 2. Run the web application in dev mode. This will up bring the react front end application on PORT 4000.
 
@@ -124,5 +63,4 @@ npm run dev
 http://localhost:4000
 ```
 
-<img src="frontend-sample.png" width="100%" height="100%"/>
 
