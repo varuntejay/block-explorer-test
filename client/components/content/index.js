@@ -457,7 +457,7 @@ export default class Content extends Component {
                         <table style={{ width: '800px' }}>
                             <tbody>
                                 <tr className="borderBottom">
-                                    <th>Txn Number</th>
+                                    <th>Txn Index</th>
                                     <th>Txn Hash</th>
                                     <th>Info</th>
                                 </tr>
