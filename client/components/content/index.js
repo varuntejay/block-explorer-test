@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './style.css'
 import axios from 'axios';
+import { Button } from '@material-ui/core';
 import {
     MdKeyboardArrowLeft,
     MdKeyboardArrowRight,
@@ -9,17 +10,22 @@ import {
 import {
     Tooltip
 } from '@material-ui/core';
+import { response } from 'express';
 
 export default class Content extends Component {
     constructor() {
         super();
         this.state = {
             blocksHeight: 0,
+            latestBlockOffset: 0,
+            size: 10,
             blocksDetails: [],
             trasactionDetailsMarkup: "",
             viewBlockMarkup: true,
             viewTransactionMarkup: false,
             transactionsTableMarkup: "",
+            fromTxnNumber: 0,
+            toTxnNumber: 0,
             row: ""
         }
     }
@@ -30,35 +36,41 @@ export default class Content extends Component {
 
     refreshBlockDetails = async () => {
         try {
+            axios.post("http://localhost:9086/eth/getBlockCount", {})
+                .then((result) => {
+                    let blocksHeight = result.data.blocksHeight;
 
-            let blocksDetails = []
-            let options = {
-                "start": 5,
-                "size": 8
-            }
-            axios.post("http://localhost:9086/eth/getBlocksWithPagination", options).then((result) => {
-                let blocks = result.data.result
-                let block;
-                for (var i in blocks) {
-                    block = blocks[i]
-                    blocksDetails.push({
-                        "blockNumber": block.number,
-                        "timestamp": block.timestamp,
-                        "hash": block.hash,
-                        "txnCount": block.transactions.length
+                    let latestBlockOffset = this.state.latestBlockOffset;
+                    let size = this.state.size;
+                    let options = {
+                        "blocksHeight": blocksHeight,
+                        "latestBlockOffset": latestBlockOffset,
+                        "size": size
+                    }
+
+                    axios.post("http://localhost:9086/eth/getBlocksWithPagination", options).then((result) => {
+                        let blocks = result.data.blocks;
+                        let blocksMapTable = {};
+                        for (var i in blocks) {
+                            blocksMapTable[blocks[i].number] = {
+                                "number": blocks[i].number,
+                                "timestamp": blocks[i].timestamp,
+                                "hash": blocks[i].hash,
+                                "transactions": blocks[i].transactions
+                            }
+                        }
+                        this.prepareBlocksTableMarkup(blocks);
+
+                        this.setState({
+                            blocksHeight: blocksHeight,
+                            blocksDetails: blocks,
+                            blocksMapTable: blocksMapTable,
+                            latestBlockOffset: latestBlockOffset,
+                            size: size
+                        })
                     })
-                }
-            })
-            console.log(blocksDetails)
+                });
 
-            this.prepareBlocksTableMarkup(blocksDetails);
-
-            this.setState({
-                blocksHeight: 10,
-                blocksDetails: blocksDetails,
-                fromBlockNumber: 1,
-                toBlockNumber: 10
-            })
         } catch (err) {
             alert(err)
         }
@@ -82,84 +94,64 @@ export default class Content extends Component {
     }
 
     fetchTransactionDetails = (event) => {
-        let txn = {
-            "gas": 103883,
-            "gasPrise": 108383833333,
-            "value": 120000000000000,
-            "sender": "0xFKE864936483403403040347030",
-            "reciever": "0xFKE864936483403403040347030"
+
+        console.log(event.target.value)
+        let params = {
+            "transactionIndex": event.target.value,
+            "blockNumber": this.state.blockNumber
         }
-        let markup =
-            <table className="transactionDetails">
-                <tbody>
-                    <tr>
-                        <td> Gas</td>
-                        <td>{txn.gas}</td>
-                    </tr>
-                    <tr>
-                        <td>Gas Prise</td>
-                        <td>{txn.gasPrise}</td>
-                    </tr>
-                    <tr>
-                        <td>Value</td>
-                        <td>{txn.value}</td>
-                    </tr>
-                    <tr>
-                        <td>Sender</td>
-                        <td>{txn.sender}</td>
-                    </tr>
-                    <tr>
-                        <td>Reciever</td>
-                        <td>{txn.reciever}</td>
-                    </tr>
-                </tbody>
-            </table>
-        this.setState({ trasactionDetailsMarkup: markup })
+        // axios.post('http://localhost:9086/eth/getTxnDetails', params)
+        //     .then((result) => {
+        //         let txn = response.data.txn;
+        //         let markup =
+        //             <table className="transactionDetails">
+        //                 <tbody>
+        //                     <tr>
+        //                         <td>Timestamp</td>
+        //                         <td>{this.state.blocksMapTable[this.state.blockNumber].timestamp}</td>
+        //                     </tr>
+        //                     <tr>
+        //                         <td>From</td>
+        //                         <td>{txn.from}</td>
+        //                     </tr>
+        //                     <tr>
+        //                         <td>To</td>
+        //                         <td>{txn.to}</td>
+        //                     </tr>
+        //                     <tr>
+        //                         <td>Value (WEI)</td>
+        //                         <td>{txn.value_wei}</td>
+        //                     </tr>
+        //                     <tr>
+        //                         <td>Gas (WEI)</td>
+        //                         <td>{txn.gas_wei}</td>
+        //                     </tr>
+        //                     <tr>
+        //                         <td>Gas Prise (WEI)</td>
+        //                         <td>{txn.gasPrice_wei}</td>
+        //                     </tr>
+        //                 </tbody>
+        //             </table >
+        //         this.setState({ trasactionDetailsMarkup: markup })
+        //     })
     }
 
     getTransactions = (event) => {
+        console.log(event.target.value);
+        let blockNumber = event.target.value;
+        let transactions = [];
+        let txnCount = this.state.blocksMapTable[blockNumber].transactions.length;
+        let fromTxnNumber = 0;
+        let toTxnNumber = (txnCount > 9) ? 9 : 9 - txnCount;
 
-        this.setState({ viewBlockMarkup: false, viewTransactionMarkup: true, blockNumber: event.target.value })
-        let transactions = [
-            {
-                "txnNumber": 1,
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3"
-            },
-            {
-                "txnNumber": 2,
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3"
-            },
-            {
-                "txnNumber": 3,
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3"
-            },
-            {
-                "txnNumber": 4,
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3"
-            },
-            {
-                "txnNumber": 5,
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3"
-            },
-            {
-                "txnNumber": 6,
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3"
-            },
-            {
-                "txnNumber": 7,
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3"
-            },
-            {
-                "txnNumber": 8,
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3"
-            },
-            {
-                "txnNumber": 9,
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3"
-            }
-        ];
+        for (let txnNumber = fromTxnNumber; txnNumber <= toTxnNumber; txnNumber++) {
+            transactions.push({
+                "txnNumber": txnNumber,
+                "hash": this.state.blocksMapTable[blockNumber].transactions[txnNumber]
+            })
+        }
+        this.setState({ viewBlockMarkup: false, viewTransactionMarkup: true, blockNumber: event.target.value, txnCount: txnCount, fromTxnNumber: fromTxnNumber, toTxnNumber: toTxnNumber })
         this.prepareTransactionsTableMarkup(transactions)
-
     }
 
     prepareBlocksTableMarkup(blocksDetails) {
@@ -168,12 +160,12 @@ export default class Content extends Component {
         blocksDetails.forEach((block) => {
             markup.push(
                 <tr className="dataBorderBottom">
-                    <td>{block.blockNumber}</td>
+                    <td>{block.number}</td>
                     <td>{block.timestamp}</td>
                     <td>{block.hash}</td>
-                    <td>{block.txnCount}</td>
+                    <td>{block.transactions.length}</td>
                     <td>
-                        <button type="button" style={{ padding: '5px' }} value={JSON.stringify(block.blockNumber)}
+                        <button type="button" style={{ padding: '5px' }} value={JSON.stringify(block.number)}
                             onClick={this.getTransactions}>Fetch</button>
                     </td>
                 </tr>
@@ -200,26 +192,44 @@ export default class Content extends Component {
         })
     }
 
-    getBlockDetails = (fromBlockNumber, toBlockNumber) => {
-        return new Promise((resolve, reject) => {
-            try {
-                let params = {
-                    fromBlockNumber: fromBlockNumber,
-                    toBlockNumber: toBlockNumber
-                }
-                axios.post('http://localhost:9086/getBlocks/details', params)
-                    .then((response) => {
-                        console.log(response)
-                        if (response.data.status) {
-                            resolve(response.data.blocksDetails);
-                        } else {
-                            throw new Error('Failed to get block height')
-                        }
-                    })
-            } catch (err) {
-                reject(err);
+    getBlockDetails = (latestBlockOffset, size) => {
+        try {
+            let params = {
+                latestBlockOffset: latestBlockOffset,
+                size: size,
+                blocksHeight: this.state.blocksHeight
             }
-        })
+            axios.post('http://localhost:9086/eth/getBlocksWithPagination', params)
+                .then((response) => {
+
+                    console.log(response)
+                    if (response.data.status) {
+                        let blocks = response.data.blocks;
+
+                        let blocksMapTable = {};
+                        for (var i in blocks) {
+                            blocksMapTable[blocks[i].number] = {
+                                "number": blocks[i].number,
+                                "timestamp": blocks[i].timestamp,
+                                "hash": blocks[i].hash,
+                                "transactions": blocks[i].transactions
+                            }
+                        }
+                        this.prepareBlocksTableMarkup(blocks);
+
+                        this.setState({
+                            blocksDetails: blocks,
+                            blocksMapTable: blocksMapTable,
+                            latestBlockOffset: latestBlockOffset,
+                            size: size
+                        })
+                    } else {
+                        throw new Error('Failed to fetch transactions')
+                    }
+                })
+        } catch (err) {
+            throw new Error('Failed to fetch transactions')
+        }
     }
 
     prepareblocksTableMarkup = (event) => {
@@ -274,30 +284,69 @@ export default class Content extends Component {
     }
 
     fetchNext = async () => {
-        let fromBlockNumber = (this.state.fromBlockNumber > 9) ? (this.state.fromBlockNumber - 10) : this.state.fromBlockNumber;
-        let toBlockNumber = (fromBlockNumber > 9) ? (fromBlockNumber - 9) : 0
-        let blocksDetails = await this.getBlockDetails(fromBlockNumber, toBlockNumber)
-        this.prepareBlocksTableMarkup(blocksDetails);
-        this.setState({
-            blocksDetails: blocksDetails,
-            fromBlockNumber: fromBlockNumber,
-            toBlockNumber: toBlockNumber
-        })
+        let latestBlockOffset = this.state.latestBlockOffset + this.state.size;
+        let size = this.state.size;
+        this.getBlockDetails(latestBlockOffset, size)
     }
 
     fetchPrev = async () => {
-        let fromBlockNumber = (this.state.blocksHeight > 9) ? (this.state.fromBlockNumber + 10) : this.state.blocksHeight - 1;
-        let toBlockNumber = (fromBlockNumber > 9) ? (fromBlockNumber - 9) : 0
-        let blocksDetails = await this.getBlockDetails(fromBlockNumber, toBlockNumber)
-        this.prepareBlocksTableMarkup(blocksDetails);
+        let latestBlockOffset = this.state.latestBlockOffset - this.state.size;
+        let size = this.state.size;
+        this.getBlockDetails(latestBlockOffset, size)
+    }
+
+    fetchNextTxn = async () => {
+        // txnCount = 23;
+        // fromTxnNumber = 0;
+        // toTxnNumber = 9;
+
+        let fromTxnNumber = this.state.fromTxnNumber + 10;
+        let toTxnNumber = (fromTxnNumber + 9 > this.state.txnCount) ? this.state.txnCount - 1 : fromTxnNumber + 9;
+        let transactions = [];
+
+        for (let txnNumber = fromTxnNumber; txnNumber <= toTxnNumber; txnNumber++) {
+            transactions.push({
+                "txnNumber": txnNumber,
+                "hash": this.state.blocksMapTable[this.state.blockNumber].transactions[txnNumber]
+            })
+        }
+
+        this.prepareTransactionsTableMarkup(transactions);
         this.setState({
-            blocksDetails: blocksDetails,
-            fromBlockNumber: fromBlockNumber,
-            toBlockNumber: toBlockNumber
+            fromTxnNumber: fromTxnNumber,
+            toTxnNumber: toTxnNumber
+        })
+    }
+
+    fetchPrevTxn = async () => {
+
+        // txnCount = 205;
+        // fromTxnNumber = 200;
+        // toTxnNumber = 204;
+
+        let fromTxnNumber = this.state.fromTxnNumber - 10
+        let toTxnNumber = fromTxnNumber + 9
+        let transactions = [];
+
+        for (let txnNumber = fromTxnNumber; txnNumber <= toTxnNumber; txnNumber++) {
+            transactions.push({
+                "txnNumber": txnNumber,
+                "hash": this.state.blocksMapTable[this.state.blockNumber].transactions[txnNumber]
+            })
+        }
+        this.prepareTransactionsTableMarkup(transactions);
+        this.setState({
+            fromTxnNumber: fromTxnNumber,
+            toTxnNumber: toTxnNumber
         })
     }
 
     render() {
+        console.log((this.state.latestBlockOffset + this.state.size >= this.state.blocksHeight))
+        console.log((this.state.latestBlockOffset == 0))
+        console.log(this.state.txnCount)
+        console.log(this.state.fromTxnNumber)
+        console.log(this.state.toTxnNumber)
         return (
             <div style={{ display: 'flex', marginTop: '20px', fontFamily: 'Open Sans' }}>
                 <div style={{ justifyContent: 'center', width: '100%', display: (this.state.viewBlockMarkup) ? 'inline-grid' : 'none' }}>
@@ -307,24 +356,24 @@ export default class Content extends Component {
                             <span style={{ fontSize: '20px' }}>Blocks</span>
                         </div>
                         <div style={{ float: 'right', display: 'flex' }}>
-                            <Tooltip title="Refresh" onClick={this.refreshBlockDetails}>
-                                <div style={{ padding: '10px', color: '#ffffff' }}>
-                                    <MdRefresh style={{ fontSize: '25px' }} />
-                                </div>
+                            <Tooltip title="Refresh Blocks" style={{ padding: '-10px' }}>
+                                <Button style={{ color: '#ffffff', padding: '10px !important' }} onClick={this.refreshBlockDetails}>
+                                    <MdRefresh style={{ fontSize: '30px' }} />
+                                </Button>
                             </Tooltip>
                             <div style={{ borderLeft: '0.5pt solid black' }}></div>
 
 
-                            <Tooltip title="Prev" onClick={this.fetchPrev} disabled={(this.state.blocksHeight == this.state.fromBlockNumber + 1)}>
-                                <div style={{ padding: '10px', color: '#ffffff' }}>
-                                    <MdKeyboardArrowLeft style={{ fontSize: '25px' }} />
-                                </div>
-
+                            <Tooltip title="Prev" style={{ padding: '-10px' }}>
+                                <Button style={{ color: '#ffffff', padding: '10px !important' }} onClick={this.fetchPrev} disabled={(this.state.latestBlockOffset == 0)}>
+                                    <MdKeyboardArrowLeft style={{ fontSize: '40px' }} />
+                                </Button>
                             </Tooltip>
-                            <Tooltip title="Next" onClick={this.fetchNext} disabled={(this.state.toBlockNumber == 0)}>
-                                <div style={{ padding: '10px', color: '#ffffff' }}>
-                                    <MdKeyboardArrowRight style={{ fontSize: '25px' }} />
-                                </div>
+
+                            <Tooltip title="Next" style={{ padding: '-10px' }}>
+                                <Button style={{ color: '#ffffff', padding: '10px !important' }} onClick={this.fetchNext} disabled={(this.state.latestBlockOffset + this.state.size >= this.state.blocksHeight)}>
+                                    <MdKeyboardArrowRight style={{ fontSize: '40px' }} />
+                                </Button>
                             </Tooltip>
                         </div>
                     </div>
@@ -350,27 +399,27 @@ export default class Content extends Component {
                                 {/* <div style={{ borderLeft: '0.5pt solid black' }}></div> */}
 
                                 <span style={{ fontSize: '20px' }}>Block&nbsp;</span>
-                                <span style={{ fontSize: '30px', paddingRight: '20px' }}>1</span>
+                                <span style={{ fontSize: '30px', paddingRight: '20px' }}>{this.state.blockNumber}</span>
 
                                 {/* <div style={{ borderLeft: '0.5pt solid black' }}></div> */}
 
                                 <span style={{ fontSize: '20px' }}>Transactions&nbsp;</span>
-                                <span style={{ fontSize: '30px' }}>20</span>
+                                <span style={{ fontSize: '30px' }}>{this.state.txnCount}</span>
                             </div>
                             <div style={{ float: 'right', display: 'flex' }}>
                                 <div style={{ borderLeft: '0.5pt solid black' }}></div>
 
 
-                                <Tooltip title="Prev" onClick={this.fetchPrev} disabled={(this.state.blocksHeight == this.state.fromBlockNumber + 1)}>
-                                    <div style={{ padding: '10px', color: '#ffffff' }}>
-                                        <MdKeyboardArrowLeft style={{ fontSize: '25px' }} />
-                                    </div>
-
+                                <Tooltip title="Prev" style={{ padding: '-10px' }}>
+                                    <Button style={{ color: '#ffffff', padding: '10px !important' }} onClick={this.fetchPrevTxn} disabled={(this.state.fromTxnNumber == 0)}>
+                                        <MdKeyboardArrowLeft style={{ fontSize: '40px' }} />
+                                    </Button>
                                 </Tooltip>
-                                <Tooltip title="Next" onClick={this.fetchNext} disabled={(this.state.toBlockNumber == 0)}>
-                                    <div style={{ padding: '10px', color: '#ffffff' }}>
-                                        <MdKeyboardArrowRight style={{ fontSize: '25px' }} />
-                                    </div>
+
+                                <Tooltip title="Next" style={{ padding: '-10px' }}>
+                                    <Button style={{ color: '#ffffff', padding: '10px !important' }} onClick={this.fetchNextTxn} disabled={(this.state.toTxnNumber + 1) == this.state.txnCount}>
+                                        <MdKeyboardArrowRight style={{ fontSize: '40px' }} />
+                                    </Button>
                                 </Tooltip>
                             </div>
                         </div>
