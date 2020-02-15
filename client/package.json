@@ -4,7 +4,9 @@
   "description": "Boilerplate Hyperledger Fabric explorer.",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build": "set NODE_ENV=production next build",
+    "start": "set NODE_ENV=production node server"
   },
   "keywords": [],
   "author": "Varun Yadavalli",

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './style.css'
 import axios from 'axios';
-import { Button } from '@material-ui/core';
+import { Button, CircularProgress } from '@material-ui/core';
 import {
     MdKeyboardArrowLeft,
     MdKeyboardArrowRight,
@@ -10,7 +10,9 @@ import {
 import {
     Tooltip
 } from '@material-ui/core';
-import { response } from 'express';
+
+import getConfig from 'next/config';
+const { publicRuntimeConfig } = getConfig();
 
 export default class Content extends Component {
     constructor() {
@@ -28,15 +30,18 @@ export default class Content extends Component {
             toTxnNumber: 0,
             row: ""
         }
+        this.API_URL = publicRuntimeConfig.API_URL
+        this.circularProgress = <CircularProgress style={{ fontSize: '20px' }} />
     }
 
     componentDidMount() {
         this.refreshBlockDetails();
+        console.log(publicRuntimeConfig)
     }
 
     refreshBlockDetails = async () => {
         try {
-            axios.post("http://localhost:9086/eth/getBlockCount", {})
+            axios.post(`${this.API_URL}/eth/getBlockCount`, {})
                 .then((result) => {
                     let blocksHeight = result.data.blocksHeight;
 
@@ -48,7 +53,7 @@ export default class Content extends Component {
                         "size": size
                     }
 
-                    axios.post("http://localhost:9086/eth/getBlocksWithPagination", options).then((result) => {
+                    axios.post(`${this.API_URL}/eth/getBlocksWithPagination`, options).then((result) => {
                         let blocks = result.data.blocks;
                         let blocksMapTable = {};
                         for (var i in blocks) {
@@ -63,22 +68,24 @@ export default class Content extends Component {
 
                         this.setState({
                             blocksHeight: blocksHeight,
-                            blocksDetails: blocks,
                             blocksMapTable: blocksMapTable,
                             latestBlockOffset: latestBlockOffset,
                             size: size
                         })
                     })
-                });
+                })
 
         } catch (err) {
             alert(err)
         }
     }
 
-    prepareTransactionsTableMarkup = (transactionDetails) => {
+    prepareTransactionsTableMarkup = (transactionDetails, blockNumber) => {
         let markup = []
-        transactionDetails.forEach((txn) => {
+        transactionDetails.forEach((txn, index) => {
+            if ( index == 0) {
+                this.getTransactionDetail(0, blockNumber)
+            }
             markup.push(
                 <tr className="dataBorderBottom">
                     <td>{txn.txnNumber}</td>
@@ -93,47 +100,59 @@ export default class Content extends Component {
         this.setState({ transactionsTableMarkup: markup })
     }
 
-    fetchTransactionDetails = (event) => {
+    getTransactionDetail = (transactionIndex, blockNumber) => {
 
-        console.log(event.target.value)
         let params = {
-            "transactionIndex": event.target.value,
-            "blockNumber": this.state.blockNumber
+            blockNumber: blockNumber,
+            transactionIndex: transactionIndex
         }
-        // axios.post('http://localhost:9086/eth/getTxnDetails', params)
-        //     .then((result) => {
-        //         let txn = response.data.txn;
-        //         let markup =
-        //             <table className="transactionDetails">
-        //                 <tbody>
-        //                     <tr>
-        //                         <td>Timestamp</td>
-        //                         <td>{this.state.blocksMapTable[this.state.blockNumber].timestamp}</td>
-        //                     </tr>
-        //                     <tr>
-        //                         <td>From</td>
-        //                         <td>{txn.from}</td>
-        //                     </tr>
-        //                     <tr>
-        //                         <td>To</td>
-        //                         <td>{txn.to}</td>
-        //                     </tr>
-        //                     <tr>
-        //                         <td>Value (WEI)</td>
-        //                         <td>{txn.value_wei}</td>
-        //                     </tr>
-        //                     <tr>
-        //                         <td>Gas (WEI)</td>
-        //                         <td>{txn.gas_wei}</td>
-        //                     </tr>
-        //                     <tr>
-        //                         <td>Gas Prise (WEI)</td>
-        //                         <td>{txn.gasPrice_wei}</td>
-        //                     </tr>
-        //                 </tbody>
-        //             </table >
-        //         this.setState({ trasactionDetailsMarkup: markup })
-        //     })
+        axios.post(`${this.API_URL}/eth/getTxnDetails`, params)
+            .then((response) => {
+                console.log(response)
+                let txn = response.data.txn;
+                let markup =
+                    <table className="transactionDetails">
+                        <tbody>
+                            <tr>
+                                <td>Txn Index</td>
+                                <td>{txn.transactionIndex}</td>
+                            </tr>
+                            <tr>
+                                <td>Timestamp</td>
+                                <td>{this.state.blocksMapTable[this.state.blockNumber].timestamp}</td>
+                            </tr>
+                            <tr>
+                                <td>From</td>
+                                <td>{txn.from}</td>
+                            </tr>
+                            <tr>
+                                <td>To</td>
+                                <td>{txn.to}</td>
+                            </tr>
+                            <tr>
+                                <td>Value (WEI)</td>
+                                <td>{txn.value_wei}</td>
+                            </tr>
+                            <tr>
+                                <td>Gas (WEI)</td>
+                                <td>{txn.gas_wei}</td>
+                            </tr>
+                            <tr>
+                                <td>Gas Prise (WEI)</td>
+                                <td>{txn.gasPrice_wei}</td>
+                            </tr>
+                        </tbody>
+                    </table >
+                this.setState({ trasactionDetailsMarkup: markup })
+            }).catch((error) => {
+                console.error(error)
+                alert('Failed to get transaction details')
+            })
+
+    }
+
+    fetchTransactionDetails = (event) => {
+        this.getTransactionDetail(event.target.value, this.state.blockNumber)
     }
 
     getTransactions = (event) => {
@@ -151,7 +170,7 @@ export default class Content extends Component {
             })
         }
         this.setState({ viewBlockMarkup: false, viewTransactionMarkup: true, blockNumber: event.target.value, txnCount: txnCount, fromTxnNumber: fromTxnNumber, toTxnNumber: toTxnNumber })
-        this.prepareTransactionsTableMarkup(transactions)
+        this.prepareTransactionsTableMarkup(transactions, blockNumber)
     }
 
     prepareBlocksTableMarkup(blocksDetails) {
@@ -162,7 +181,7 @@ export default class Content extends Component {
                 <tr className="dataBorderBottom">
                     <td>{block.number}</td>
                     <td>{block.timestamp}</td>
-                    <td>{block.hash}</td>
+                    <td style={{ fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif' }}>{block.hash}</td>
                     <td>{block.transactions.length}</td>
                     <td>
                         <button type="button" style={{ padding: '5px' }} value={JSON.stringify(block.number)}
@@ -177,7 +196,7 @@ export default class Content extends Component {
     getBlockHeight = () => {
         return new Promise((resolve, reject) => {
             try {
-                axios.post('http://localhost:9086/getBlocks/height')
+                axios.post(`${this.API_URL}/getBlocks/height`)
                     .then((response) => {
                         console.log(response)
                         if (response.data.status) {
@@ -199,7 +218,7 @@ export default class Content extends Component {
                 size: size,
                 blocksHeight: this.state.blocksHeight
             }
-            axios.post('http://localhost:9086/eth/getBlocksWithPagination', params)
+            axios.post(`${this.API_URL}/eth/getBlocksWithPagination`, params)
                 .then((response) => {
 
                     console.log(response)
@@ -218,7 +237,6 @@ export default class Content extends Component {
                         this.prepareBlocksTableMarkup(blocks);
 
                         this.setState({
-                            blocksDetails: blocks,
                             blocksMapTable: blocksMapTable,
                             latestBlockOffset: latestBlockOffset,
                             size: size
@@ -250,6 +268,10 @@ export default class Content extends Component {
             markup.push(
                 <table>
                     <tbody>
+                        <tr>
+                            <td> Txn index</td>
+                            <td>{blockDetails.transactionIndex}</td>
+                        </tr>
                         <tr>
                             <td> Block number</td>
                             <td>{blockDetails.blockNumber}</td>
@@ -305,13 +327,16 @@ export default class Content extends Component {
         let transactions = [];
 
         for (let txnNumber = fromTxnNumber; txnNumber <= toTxnNumber; txnNumber++) {
+            if (txnNumber == fromTxnNumber) {
+                this.getTransactionDetail(fromTxnNumber, this.state.blockNumber)
+            }
             transactions.push({
                 "txnNumber": txnNumber,
                 "hash": this.state.blocksMapTable[this.state.blockNumber].transactions[txnNumber]
             })
         }
 
-        this.prepareTransactionsTableMarkup(transactions);
+        this.prepareTransactionsTableMarkup(transactions, this.state.blockNumber);
         this.setState({
             fromTxnNumber: fromTxnNumber,
             toTxnNumber: toTxnNumber
@@ -329,12 +354,15 @@ export default class Content extends Component {
         let transactions = [];
 
         for (let txnNumber = fromTxnNumber; txnNumber <= toTxnNumber; txnNumber++) {
+            if (txnNumber == fromTxnNumber) {
+                this.getTransactionDetail(fromTxnNumber, this.state.blockNumber)
+            }
             transactions.push({
                 "txnNumber": txnNumber,
                 "hash": this.state.blocksMapTable[this.state.blockNumber].transactions[txnNumber]
             })
         }
-        this.prepareTransactionsTableMarkup(transactions);
+        this.prepareTransactionsTableMarkup(transactions, this.state.blockNumber);
         this.setState({
             fromTxnNumber: fromTxnNumber,
             toTxnNumber: toTxnNumber
@@ -348,7 +376,7 @@ export default class Content extends Component {
         console.log(this.state.fromTxnNumber)
         console.log(this.state.toTxnNumber)
         return (
-            <div style={{ display: 'flex', marginTop: '20px', fontFamily: 'Open Sans' }}>
+            <div style={{ display: 'flex', marginTop: '20px', fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif' }}>
                 <div style={{ justifyContent: 'center', width: '100%', display: (this.state.viewBlockMarkup) ? 'inline-grid' : 'none' }}>
                     <div className="navigator" style={{ width: '1280px' }}>
                         <div style={{ float: 'left', paddingLeft: '15px' }}>
@@ -434,7 +462,7 @@ export default class Content extends Component {
                             </tbody>
                         </table>
                     </div>
-                    <div style={{ width: '500px' }}>
+                    <div style={{ width: '600px' }}>
                         <div className="navigator">
                             <div style={{ float: 'left', fontSize: '20px', padding: '15px' }}>Transaction Details</div>
                             {/* {this.state.trasactionDetailsMarkup} */}

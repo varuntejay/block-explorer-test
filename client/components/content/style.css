@@ -43,7 +43,7 @@
     background-color: #24292e;
     border-collapse: collapse;
     table-layout: fixed;
-    width: 500px;
+    width: 600px;
     margin-left: -10px;
 }
 
@@ -58,7 +58,7 @@
 
 .transactionDetails table td:first-child {
     font-weight: bold;
-    width: 80px;
+    width: 45px;
 }
 
 

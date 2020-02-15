@@ -36,11 +36,12 @@ router.post('/getBlocksWithPagination', async (req, res) => {
 
 
 router.post('/getTxnDetails', async (req, res) => {
-    const txnHash = req.body.txnHash
-        const db = dbConnection.db('eth_db');
-    console.log(req.body)
 
-    db.collection('transactions').find({ "blockNumber": 500002, "transactionIndex": 0 }).project({}).toArray((err, result) => {
+    const db = dbConnection.db('eth_db');
+    console.log(req.body)
+    console.log(req.body.blockNumber)
+
+    db.collection('transactions').find({ "blockNumber": parseInt(req.body.blockNumber), "transactionIndex": parseInt(req.body.transactionIndex) }).project({}).toArray((err, result) => {
         console.error(err)
         console.log("txn", result[0])
         res.send(
@@ -50,6 +51,24 @@ router.post('/getTxnDetails', async (req, res) => {
             })
     })
 })
+
+router.post('/getTxnDetails2', async (req, res) => {
+
+    const db = dbConnection.db('eth_db');
+    console.log(req.body)
+
+
+    db.collection('transactions').find({"blockNumber": 1500001}).toArray((err, result) => {
+            console.error(err)
+            console.log("txn", result[0])
+            res.send(
+                {
+                    status: true,
+                    txn: result[0]
+                })
+        })
+})
+
 
 router.post("/deleteDocument", async (req, res) => {
 
@@ -68,7 +87,7 @@ router.post("/getBlockCount", async (req, res) => {
 
     db.collection('blocks').stats((err, result) => {
         console.log(result.count)
-        res.send({status: true, blocksHeight: result.count})
+        res.send({ status: true, blocksHeight: result.count })
     })
 });
 
