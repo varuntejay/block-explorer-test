@@ -30,63 +30,26 @@ export default class Content extends Component {
 
     refreshBlockDetails = async () => {
         try {
-            // this.getPeersCount();
-            // this.getChaincodesCount();
-            // let blocksHeight = await this.getBlockHeight();
-            // let fromBlockNumber = blocksHeight - 1;
-            // let toBlockNumber = (fromBlockNumber > 9) ? (fromBlockNumber - 9) : 0
-            // let blocksDetails = await this.getBlockDetails(fromBlockNumber, toBlockNumber)
-            // this.prepareBlocksTableMarkup(blocksDetails);
-            // this.setState({
-            //     blocksHeight: blocksHeight,
-            //     blocksDetails: blocksDetails,
-            //     fromBlockNumber: fromBlockNumber,
-            //     toBlockNumber: toBlockNumber
-            // })
 
-            let blocksDetails = [{
-                "blockNumber": 1,
-                "timestamp": "02/12/2020",
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3",
-                "txnCount": 2
-            },
-            {
-                "blockNumber": 2,
-                "timestamp": "02/12/2020",
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3",
-                "txnCount": 2
-            },
-            {
-                "blockNumber": 3,
-                "timestamp": "02/12/2020",
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3",
-                "txnCount": 2
-            },
-            {
-                "blockNumber": 4,
-                "timestamp": "02/12/2020",
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3",
-                "txnCount": 2
-            },
-            {
-                "blockNumber": 5,
-                "timestamp": "02/12/2020",
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3",
-                "txnCount": 2
-            },
-            {
-                "blockNumber": 6,
-                "timestamp": "02/12/2020",
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3",
-                "txnCount": 2
-            },
-            {
-                "blockNumber": 1,
-                "timestamp": "02/12/2020",
-                "hash": "0xKJFKEFOEFOUEJBB892698BEKJBE93Y3",
-                "txnCount": 2
+            let blocksDetails = []
+            let options = {
+                "start": 5,
+                "size": 8
             }
-            ];
+            axios.post("http://localhost:9086/eth/getBlocksWithPagination", options).then((result) => {
+                let blocks = result.data.result
+                let block;
+                for (var i in blocks) {
+                    block = blocks[i]
+                    blocksDetails.push({
+                        "blockNumber": block.number,
+                        "timestamp": block.timestamp,
+                        "hash": block.hash,
+                        "txnCount": block.transactions.length
+                    })
+                }
+            })
+            console.log(blocksDetails)
 
             this.prepareBlocksTableMarkup(blocksDetails);
 
@@ -100,12 +63,6 @@ export default class Content extends Component {
             alert(err)
         }
     }
-
-
-    // handleAccordion = (event) => {
-    //     console.log(event.target.value)
-    //     this.setState({ row: event.target.value })
-    // }
 
     prepareTransactionsTableMarkup = (transactionDetails) => {
         let markup = []
@@ -342,7 +299,7 @@ export default class Content extends Component {
 
     render() {
         return (
-            <div style={{ display: 'flex', marginTop: '20px', fontFamily: 'Open Sans'}}>
+            <div style={{ display: 'flex', marginTop: '20px', fontFamily: 'Open Sans' }}>
                 <div style={{ justifyContent: 'center', width: '100%', display: (this.state.viewBlockMarkup) ? 'inline-grid' : 'none' }}>
                     <div className="navigator" style={{ width: '1280px' }}>
                         <div style={{ float: 'left', paddingLeft: '15px' }}>
@@ -400,7 +357,7 @@ export default class Content extends Component {
                                 <span style={{ fontSize: '20px' }}>Transactions&nbsp;</span>
                                 <span style={{ fontSize: '30px' }}>20</span>
                             </div>
-                            <div style={{ float: 'right', display: 'flex' }}>                                
+                            <div style={{ float: 'right', display: 'flex' }}>
                                 <div style={{ borderLeft: '0.5pt solid black' }}></div>
 
 
