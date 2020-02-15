@@ -380,6 +380,9 @@ export default class Content extends Component {
                 <div style={{ justifyContent: 'center', width: '100%', display: (this.state.viewBlockMarkup) ? 'inline-grid' : 'none' }}>
                     <div className="navigator" style={{ width: '1280px' }}>
                         <div style={{ float: 'left', paddingLeft: '15px' }}>
+                            {/* <span style={{ fontSize: '30px'}}>ETHEREUM</span> */}
+                            {/* <div style={{ borderRight: '0.5pt solid black' }}></div> */}
+
                             <span style={{ fontSize: '30px' }}>{this.state.blocksHeight}&nbsp;</span>
                             <span style={{ fontSize: '20px' }}>Blocks</span>
                         </div>
