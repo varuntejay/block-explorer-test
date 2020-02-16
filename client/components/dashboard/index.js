@@ -42,6 +42,10 @@ export default class Dashboard extends Component {
         if (errorFields.length > 0) {
             this.setState({ errorFields: errorFields })
         } else {
+            axios.post(`${this.API_URL}/eth/filterTransactions`)
+            .then((response) =>{
+                let txns = response.data.
+            })
             let txns = [
                 {
                     "blockNumber": 123,

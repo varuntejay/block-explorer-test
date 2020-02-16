@@ -11,7 +11,7 @@ module.exports.getFilteredTransactions = async (filterParams) => {
         let query = {
             $and: [{ timestamp: { $gt: startTime } }, { timestamp: { $lt: endTime } }]
         }
-        let filteredBlocks = await dbConnection.db("eth_db").collection("blocks").find(query, { projection: { "_id": 0, "number": 1 } })
+        let filteredBlocks = await dbConnection.db("eth_db").collection("blocks").find(query, { projection: { "_id": 0, "number": 1, "hash": 1, "transactionIndex": 1, "value": 1 } })
         return filteredBlocks
     }
 }

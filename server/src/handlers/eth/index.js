@@ -50,39 +50,35 @@ router.post('/getTxnDetails', async (req, res) => {
     })
 })
 
-router.post('/getTxnDetails2', async (req, res) => {
+// router.post('/getTxnDetails2', async (req, res) => {
 
-    const db = dbConnection.db('eth_db');
-    console.log(req.body)
-
-
-    db.collection('transactions').find({ "blockNumber": 1500001 }).toArray((err, result) => {
-        console.error(err)
-        console.log("txn", result[0])
-        res.send(
-            {
-                status: true,
-                txn: result[0]
-            })
-    })
-})
+//     const db = dbConnection.db('eth_db');
+//     console.log(req.body)
 
 
-router.post("/deleteDocument", async (req, res) => {
+//     db.collection('transactions').find({ "blockNumber": 1500001 }).toArray((err, result) => {
+//         console.error(err)
+//         console.log("txn", result[0])
+//         res.send(
+//             {
+//                 status: true,
+//                 txn: result[0]
+//             })
+//     })
+// })
 
-    // const db = dbConnection.db('eth_db');
-    // db.collection('blocks').deleteOne({ "_id": new mongodb.ObjectID("5e44e61b4f46132edef842e2")}, (err, result) => {
-    //     console.error(err)
-    //     console.log(result);
-    //     res.send({staus: true, result: result})
-    // })
 
-})
+// router.post("/deleteDocument", async (req, res) => {
+//     const db = dbConnection.db('eth_db');
+//     db.collection('blocks').deleteOne({ "_id": new mongodb.ObjectID("5e44e61b4f46132edef842e2")}, (err, result) => {
+//         console.error(err)
+//         console.log(result);
+//         res.send({staus: true, result: result})
+//     })
+// })
 
 router.post("/getBlockCount", async (req, res) => {
-
     const db = dbConnection.db('eth_db');
-
     db.collection('blocks').find().project({ "number": 1 }).sort({ "number": -1 }).limit(1).toArray((err, result) => {
         console.log("blocks", result)
         res.send(
@@ -91,21 +87,16 @@ router.post("/getBlockCount", async (req, res) => {
                 blocksHeight: result[0].number
             })
     })
-
-    // db.collection('blocks').stats((err, result) => {
-    //     console.log(result.count)
-    //     res.send({ status: true, blocksHeight: result.count })
-    // })
 });
 
 /**
  * 
  */
 router.post("/filterTransactions", async (req, res) => {
-    let filterParams = req.body;
-    let filteredData = await getFilteredTransactions(filterParams);
-    res.status(200).send(filteredData)
-
+    db.collection('blocks').find().project({ "timestamp": 1 }).sort({ "number": -1 }).limit(1).toArray( async (err, result) => {
+        let filteredData = await getFilteredTransactions({ "endTime": result[0].timestamp });
+        res.status(200).send(filteredData)
+    })
 });
 
 module.exports = router;
