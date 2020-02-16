@@ -18,14 +18,14 @@ export default class MenuBar extends Component {
     componentDidMount() {
         this.menuContent = [        
             {
+                "id": "bitcoin",
+                "label": "Bitcoin",
+                "url": "/bitcoin"
+            },
+            {
                 "id": "ethereum",
                 "label": "Ethereum",
                 "url": "/ethereum"
-            },
-            {
-                "id": "bitcoin",
-                "label": "Bitcoin Coming soon!",
-                "url": "/bitcoin"
             }
         ]
 
