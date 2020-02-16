@@ -1,6 +1,6 @@
 const express = require('express');
 const { getConnection } = require('../../lib/mongo')
-const getFilteredTransactions = require('./../filterTransactions/transactionFilter')
+const { getFilteredTransactions } = require('./../filterTransactions/transactionFilter')
 const router = express.Router();
 let dbConnection;
 getConnection()
@@ -104,7 +104,8 @@ router.post("/getBlockCount", async (req, res) => {
 router.post("/filterTransactions", async (req, res) => {
     let filterParams = req.body;
     let filteredData = await getFilteredTransactions(filterParams);
-    res.status(200).send(filteredData)
+    console.log(filteredData)
+    res.status(200).send({ result: filteredData })
 
 });
 
