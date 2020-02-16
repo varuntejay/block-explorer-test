@@ -85,10 +85,19 @@ router.post("/getBlockCount", async (req, res) => {
 
     const db = dbConnection.db('eth_db');
 
-    db.collection('blocks').stats((err, result) => {
-        console.log(result.count)
-        res.send({ status: true, blocksHeight: result.count })
+    db.collection('blocks').find().project({"number": 1}).sort({ "number": -1 }).limit(1).toArray((err, result) => {
+        console.log("blocks", result)
+        res.send(
+            {
+                status: true,
+                blocksHeight: result[0].number
+            })
     })
+
+    // db.collection('blocks').stats((err, result) => {
+    //     console.log(result.count)
+    //     res.send({ status: true, blocksHeight: result.count })
+    // })
 });
 
 module.exports = router;

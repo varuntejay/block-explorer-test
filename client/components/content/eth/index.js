@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './style.css'
+import '../style.css'
 import axios from 'axios';
 import { Button, CircularProgress } from '@material-ui/core';
 import {
@@ -128,6 +128,10 @@ export default class Content extends Component {
                             <tr>
                                 <td>To</td>
                                 <td>{txn.to}</td>
+                            </tr>
+                            <tr>
+                                <td>Value (Ether)</td>
+                                <td>{txn.value}</td>
                             </tr>
                             <tr>
                                 <td>Value (WEI)</td>

@@ -1,6 +1,8 @@
 const express                       = require('express');
 const bodyParser                    = require('body-parser');
 const ethHandler                    = require('./src/handlers/eth');
+const bitcoinHandler                = require('./src/handlers/bitcoin');
+
 
 const app               = express();
 const port              = process.env.PORT || 9086;
@@ -24,7 +26,8 @@ registerRoutes = () => {
         next();
     });
 
-    app.use('/eth', ethHandler);    
+    app.use('/eth', ethHandler);
+    app.use('/bitcoin', bitcoinHandler)    
 }
 
 server = () => {

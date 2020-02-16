@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Layout from '../components/layout';
 import './../stylesheets/public.css';
-import Content from './../components/content' 
+import Content from './../components/content/eth' 
 
 export default class Accounts extends Component {
   constructor() {
