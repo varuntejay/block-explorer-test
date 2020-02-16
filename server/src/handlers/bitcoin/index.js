@@ -1,6 +1,6 @@
 const express = require('express');
 const { getConnection } = require('../../lib/mongo')
-
+const { getFilteredTransactions } = require('./../filterTransactions/btcTransactionFilter')
 const router = express.Router();
 let dbConnection;
 getConnection()
@@ -69,6 +69,14 @@ router.post("/getBlockCount", async (req, res) => {
         console.log(result.count)
         res.send({ status: true, blocksHeight: result.count })
     })
+});
+
+router.post("/filterTransactions", async (req, res) => {
+    let filterParams = req.body;
+    let filteredData = await getFilteredTransactions(filterParams);
+    console.log(filteredData)
+    res.status(200).send({ result: filteredData })
+
 });
 
 module.exports = router;
