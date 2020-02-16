@@ -20,20 +20,18 @@ module.exports.getFilteredTransactions = async (filterParams) => {
         let minBlock = filteredBlocks[filteredBlocks.length - 1].number
         let maxBlock = filteredBlocks[0].number;
         query = {
-            $and: [{ blockNumber: { $gt: minBlock } }, { blockNumber: { $lt: maxBlock } }, { value: { $gt: minEth } }]
+            $and: [{ blockNumber: { $gt: minBlock } }, { blockNumber: { $lt: maxBlock } }, { value: { $gt: parseFloat(minEth) } }]
         }
         let projections = {
             "projection": {
-                "from": 1,
-                "to": 1,
-                "_id": -1,
+                "hash": 1,
                 "value": 1,
                 "blockNumber": 1,
                 "transactionIndex": 1
             }
         }
         console.log(JSON.stringify(query))
-        let filteredTransactions = await dbConnection.db("eth_db").collection("transactions").find(query, projections).limit(5).toArray();
+        let filteredTransactions = await dbConnection.db("eth_db").collection("transactions").find(query, projections).limit(50).toArray();
         console.log(filteredTransactions)
         return filteredTransactions
     }

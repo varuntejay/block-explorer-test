@@ -93,11 +93,15 @@ router.post("/getBlockCount", async (req, res) => {
  * 
  */
 router.post("/filterTransactions", async (req, res) => {
-    let filterParams = req.body;
-    let filteredData = await getFilteredTransactions(filterParams);
-    console.log(filteredData)
-    res.status(200).send({ result: filteredData })
-
+    console.log(req.body)
+    const db = dbConnection.db('eth_db');
+    db.collection('blocks').find().project({ "timestamp": 1 }).sort({ "number": -1 }).limit(1).toArray( async (err, result) => {
+        getFilteredTransactions({"endTime": result[0].timestamp, "minEth": req.body.coins})
+        .then((filteredData) => {
+            console.log(filteredData)
+            res.status(200).send({ txns: filteredData })
+        })
+    })
 });
 
 module.exports = router;

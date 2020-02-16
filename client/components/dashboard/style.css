@@ -45,7 +45,7 @@
     border-collapse: collapse;
     table-layout: fixed;
     width: 600px;
-    margin-left: -10px;
+    margin-left: 15px;
     word-wrap: break-word;
     white-space: normal;
 }

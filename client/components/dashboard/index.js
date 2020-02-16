@@ -17,6 +17,7 @@ export default class Dashboard extends Component {
         super();
         this.state = {
             txnsMarkup: "",
+            trasactionDetailsMarkup: "",
             coinType: "",
             coins: 0.1,
             errorFields: []
@@ -42,156 +43,119 @@ export default class Dashboard extends Component {
         if (errorFields.length > 0) {
             this.setState({ errorFields: errorFields })
         } else {
-            axios.post(`${this.API_URL}/eth/filterTransactions`)
-            .then((response) =>{
-                let txns = response.data.
-            })
-            let txns = [
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-                {
-                    "blockNumber": 123,
-                    "from": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "to": "0x26588a9301b0428d95e6Fc3A5024fcE8BEc12D51",
-                    "ether": 0.0000334
-                },
-            ];
-
-            let txnCount = txns.length;
-            let fromTxnNumber = 0;
-            let toTxnNumber = (txnCount > 9) ? 9 : 9 - txnCount;
-
-            let transactions = [];
-
-            for (let txnNumber = fromTxnNumber; txnNumber <= toTxnNumber; txnNumber++) {
-                transactions.push(txns[txnNumber])
+            let params = {
+                "coins": this.state.coins
             }
-            this.setState({ txnCount: txnCount, fromTxnNumber: fromTxnNumber, toTxnNumber: toTxnNumber, txns: txns })
-            this.prepareTableMarkup(transactions)
+            axios.post(`${this.API_URL}/eth/filterTransactions`, params)
+                .then((response) => {
+                    let txns = response.data.txns;
+                    let txnCount = txns.length;
+                    let fromTxnNumber = 0;
+                    let toTxnNumber = (txnCount > 9) ? 9 : 9 - txnCount;
 
+                    let transactions = [];
+
+                    for (let txnNumber = fromTxnNumber; txnNumber <= toTxnNumber; txnNumber++) {
+                        transactions.push(txns[txnNumber])
+                    }
+                    this.setState({ txnCount: txnCount, fromTxnNumber: fromTxnNumber, toTxnNumber: toTxnNumber, txns: txns })
+                    this.prepareTableMarkup(transactions)
+                })
         }
     }
 
     prepareTableMarkup = (txns) => {
         let rowsMarkup = []
-        txns.forEach(txn => {
-
+        txns.forEach((txn, index) => {
+            if (index == 0) {
+                this.getTransactionDetail(txn.transactionIndex, txn.blockNumber)
+            }
             rowsMarkup.push(
                 <tr className="dataBorderBottom">
-                    <td>{txn.number}</td>
-                    {/* <td>{txn.timestamp}</td> */}
-                    <td>{txn.from}</td>
-                    <td>{txn.to}</td>
-                    <td>{txn.ether}</td>
+                    <td>{txn.blockNumber}</td>
+                    <td>{txn.hash}</td>
+                    <td>{txn.value}</td>
+                    <td>
+                        <button type="button" style={{ padding: '5px' }} value={JSON.stringify({ "transactionIndex": txn.transactionIndex, "blockNumber": txn.blockNumber })}
+                            onClick={this.fetchTransactionDetails}>Fetch</button>
+                    </td>
                 </tr>
             )
         });
 
-        let markup = <table>
+        let markup = <table style={{ width: '800px' }}>
             <tbody>
                 {/*  <tr>
                     
                 </tr> */}
                 <tr className="borderBottom">
                     <th>Block Number</th>
-                    {/* <th>Timestamp</th> */}
-                    <th>From</th>
-                    <th>To</th>
-                    <th>Value (Ether)</th>
+                    <th>Hash</th>
+                    <th>Value ({this.state.coinType === "eth" ? 'Ether' : 'BTC '})</th>
+                    <th>Transaction details</th>
                 </tr>
                 {rowsMarkup}
             </tbody>
         </table>
 
         this.setState({ txnsMarkup: markup })
+    }
+
+    getTransactionDetail = (transactionIndex, blockNumber) => {
+
+        let params = {
+            blockNumber: blockNumber,
+            transactionIndex: transactionIndex
+        }
+        console.log(params)
+        axios.post(`${this.API_URL}/eth/getTxnDetails`, params)
+            .then((response) => {
+                console.log(response)
+                let txn = response.data.txn;
+                let markup =
+                    <table className="transactionDetails" style={{width: '600px', marginLeft: '15px'}}>
+                        <tbody>
+                            <tr>
+                                <td>Txn Index</td>
+                                <td>{txn.transactionIndex}</td>
+                            </tr>
+                            <tr>
+                                <td>From</td>
+                                <td>{txn.from}</td>
+                            </tr>
+                            <tr>
+                                <td>To</td>
+                                <td>{txn.to}</td>
+                            </tr>
+                            <tr>
+                                <td>Value (Ether)</td>
+                                <td>{txn.value}</td>
+                            </tr>
+                            <tr>
+                                <td>Value (WEI)</td>
+                                <td>{txn.value_wei}</td>
+                            </tr>
+                            <tr>
+                                <td>Gas (WEI)</td>
+                                <td>{txn.gas_wei}</td>
+                            </tr>
+                            <tr>
+                                <td>Gas Prise (WEI)</td>
+                                <td>{txn.gasPrice_wei}</td>
+                            </tr>
+                        </tbody>
+                    </table >
+                this.setState({ trasactionDetailsMarkup: markup })
+            }).catch((error) => {
+                console.error(error)
+                alert('Failed to get transaction details')
+            })
+
+    }
+
+    fetchTransactionDetails = (event) => {
+        console.log(event.target.value)
+        this.getTransactionDetail(JSON.parse(event.target.value).transactionIndex, JSON.parse(event.target.value).blockNumber)
     }
 
     fetchNext = async () => {
@@ -254,24 +218,38 @@ export default class Dashboard extends Component {
                             <button style={{ paddingTop: '15px', paddingBottom: "15px", paddingLeft: "30px", paddingRight: "30px", backgroundColor: "black", color: "white", width: "90px" }} onClick={this.viewDetails}>Fetch</button>
                         </div>
                     </div>
-                    {this.state.txnsMarkup !== "" ?
-                        <div style={{ backgroundColor: "#343d4682", marginTop: '20px', marginBottom: '10px' }}>
-                            <span style={{ float: 'left', color: '#ffffff', fontSize: '20px', padding: '15px' }}>
-                                Showing transactions from to date
+                    <div style={{ display: 'flex' }}>
+                        <div>
+                            {this.state.txnsMarkup !== "" ?
+                                <div style={{ backgroundColor: "#343d4682", marginTop: '20px', marginBottom: '10px', width: '800px' }}>
+                                    <span style={{ float: 'left', color: '#ffffff', fontSize: '20px', padding: '15px' }}>
+                                        Showing transactions from to date
                             </span>
-                            <Tooltip title="Prev" style={{ padding: '-10px' }}>
-                                <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchNext} disabled={(this.state.toTxnNumber + 1) == this.state.txnCount}>
-                                    <MdKeyboardArrowRight style={{ fontSize: '40px' }} />
-                                </Button>
-                            </Tooltip>
-                            <Tooltip title="Next" style={{ padding: '-10px' }}>
-                                <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchPrev} disabled={(this.state.fromTxnNumber == 0)}>
-                                    <MdKeyboardArrowLeft style={{ fontSize: '40px' }} />
-                                </Button>
-                            </Tooltip>
+                                    <Tooltip title="Next" style={{ padding: '-10px' }}>
+                                        <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchNext} disabled={(this.state.toTxnNumber + 1) == this.state.txnCount}>
+                                            <MdKeyboardArrowRight style={{ fontSize: '40px' }} />
+                                        </Button>
+                                    </Tooltip>
+                                    <Tooltip title="Prev" style={{ padding: '-10px' }}>
+                                        <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchPrev} disabled={(this.state.fromTxnNumber == 0)}>
+                                            <MdKeyboardArrowLeft style={{ fontSize: '40px' }} />
+                                        </Button>
+                                    </Tooltip>
+                                </div>
+                                : null}
+                            {this.state.txnsMarkup}
                         </div>
-                        : null}
-                    {this.state.txnsMarkup}
+                        <div style={{width: '600px'}}>
+                            {this.state.trasactionDetailsMarkup !== "" ?
+                                <div style={{ backgroundColor: "#343d4682", marginTop: '20px', marginBottom: '10px', width: '600px' }}>
+                                    <span style={{ float: 'left', color: '#ffffff', fontSize: '20px', padding: '15px' }}>
+                                        Transaction details                            
+                                    </span>
+                                </div>
+                                : null}
+                            {this.state.trasactionDetailsMarkup}
+                        </div>
+                    </div>
                 </div>
             </div>
         )
