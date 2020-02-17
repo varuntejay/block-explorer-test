@@ -23,7 +23,7 @@ export default class Dashboard extends Component {
         }
         this.API_URL = publicRuntimeConfig.API_URL
         this.circularProgress = <CircularProgress style={{ fontSize: '20px' }} />
-        this.noDataMarkup = <div style={{marginTop: '15px', textAlign: 'center', fontSize: '30px', color: '#ffffff'}}>No transactions found</div>
+        this.noDataMarkup = <div style={{ marginTop: '15px', textAlign: 'center', fontSize: '30px', color: '#ffffff' }}>No transactions found</div>
     }
 
     componentDidMount() { }
@@ -54,16 +54,16 @@ export default class Dashboard extends Component {
                         if (txnCount > 0) {
                             let fromTxnNumber = 0;
                             let toTxnNumber = (txnCount > 9) ? 9 : 9 - txnCount;
-    
+
                             let transactions = [];
-    
+
                             for (let txnNumber = fromTxnNumber; txnNumber <= toTxnNumber; txnNumber++) {
                                 transactions.push(txns[txnNumber])
                             }
                             this.setState({ txnCount: txnCount, fromTxnNumber: fromTxnNumber, toTxnNumber: toTxnNumber, txns: txns })
                             this.prepareTableMarkup(transactions)
                         } else {
-                            this.setState({txnsMarkup: this.noDataMarkup, trasactionDetailsMarkup: ''})
+                            this.setState({ txnsMarkup: this.noDataMarkup, trasactionDetailsMarkup: '' })
                         }
                     })
             } else {
@@ -84,8 +84,8 @@ export default class Dashboard extends Component {
                             }
                             this.setState({ txnCount: txnCount, fromTxnNumber: fromTxnNumber, toTxnNumber: toTxnNumber, txns: txns })
                             this.prepareTableMarkup(transactions)
-                        } else {                            
-                            this.setState({txnsMarkup: this.noDataMarkup, trasactionDetailsMarkup:''})
+                        } else {
+                            this.setState({ txnsMarkup: this.noDataMarkup, trasactionDetailsMarkup: '' })
                         }
                     })
             }
@@ -95,7 +95,10 @@ export default class Dashboard extends Component {
     prepareTableMarkup = (txns) => {
         let rowsMarkup = []
         txns.forEach((txn, index) => {
-            if (this.state.coinType === 'eth') {
+            console.log('***************')
+            console.log(txn);
+            console.log(txn.height);
+            if (this.state.coinType === 'eth' && txn !== undefined) {
                 if (index == 0) {
                     this.getTransactionDetail(txn.transactionIndex, txn.blockNumber)
                 }
@@ -111,7 +114,7 @@ export default class Dashboard extends Component {
                         </td>
                     </tr>
                 )
-            } else {
+            } else if (txn !== undefined) {
                 if (index == 0) {
                     this.getTransactionDetail(txn.txnIndex, txn.height)
                 }
@@ -131,7 +134,7 @@ export default class Dashboard extends Component {
         });
 
         let markup = <table style={{ width: '900px' }}>
-            <tbody>                
+            <tbody>
                 <tr className="borderBottom">
                     <th>Block Number</th>
                     <th>Hash</th>
@@ -206,7 +209,7 @@ export default class Dashboard extends Component {
                                 <tr>
                                     <td>Txn Index</td>
                                     <td>{txn.txnIndex}</td>
-                                </tr>                                
+                                </tr>
                                 <tr>
                                     <td>Confirmations</td>
                                     <td>{txn.confirmations}</td>
@@ -278,7 +281,7 @@ export default class Dashboard extends Component {
                     </div>
                     <div>
                         <div style={{ float: "left" }}>
-                            <FormControl style={{borderRadius: '10px'}}>
+                            <FormControl style={{ borderRadius: '10px' }}>
                                 <InputLabel >Crypto currency type</InputLabel>
                                 <Select
                                     value={this.state.coinType}
@@ -290,7 +293,7 @@ export default class Dashboard extends Component {
                                     <MenuItem value={'bitcoin'}>Bitcoin</MenuItem>
                                 </Select>
                             </FormControl>
-                            
+
                             <TextField type="number" label="Threshold" name="coins" value={this.state.coins} onChange={this.handleChange} style={{ width: "200px", marginLeft: '20px', borderRadius: '10px', marginRight: "20px" }} error={(this.state.errorFields).includes['coins']} />
                             <button style={{ paddingTop: '15px', paddingBottom: "15px", paddingLeft: "30px", paddingRight: "30px", backgroundColor: "black", color: "white", width: "90px", borderRadius: '15px' }} onClick={this.viewDetails}>Fetch</button>
                         </div>
