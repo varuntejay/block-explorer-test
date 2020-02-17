@@ -276,7 +276,7 @@ export default class Dashboard extends Component {
                 <div style={{ justifyContent: 'center', width: '100%', display: 'inline-grid' }}>
                     <div className="navigator" style={{ width: '1500px', paddingBottom: '16px' }}>
                         <div style={{ float: 'left', paddingLeft: '15px' }}>
-                            <span style={{ fontSize: '30px' }}>Dashboard&nbsp;</span>
+                            <span style={{ fontSize: '30px' }}>Dashboard&nbsp;-&nbsp;Fetch latest block time 24 hours transactions</span>
                         </div>
                     </div>
                     <div>

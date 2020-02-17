@@ -1,5 +1,5 @@
-import React,{ Component } from 'react';
-import { ButtonBase, Popper, ClickAwayListener, MenuList, MenuItem, Grow, Paper } from '@material-ui/core' ;
+import React, { Component } from 'react';
+import { ButtonBase, Popper, ClickAwayListener, MenuList, MenuItem, Grow, Paper } from '@material-ui/core';
 import { MdHome } from 'react-icons/md';
 import Link from 'next/link';
 import './style.css'
@@ -16,7 +16,12 @@ export default class MenuBar extends Component {
     }
 
     componentDidMount() {
-        this.menuContent = [        
+        this.menuContent = [
+            {
+                "id": "dashboard",
+                "label": "Dashboard",
+                "url": "/dashboard"
+            },
             {
                 "id": "bitcoin",
                 "label": "Bitcoin",
@@ -33,21 +38,21 @@ export default class MenuBar extends Component {
     }
 
     buildTopLevelMenu = (menuItems) => {
-        this.setState({topMenu: []});        
+        this.setState({ topMenu: [] });
         let topMenu = [];
-        topMenu.push(<MenuButton><Link href={`/`}><MdHome style={{ fontSize: '20px' }}/></Link></MenuButton>)
+        topMenu.push(<MenuButton><Link href={`/`}><MdHome style={{ fontSize: '20px' }} /></Link></MenuButton>)
         menuItems.forEach(element => {
             let markup;
             if (element.url && element.url.trim().length > 0) {
                 if (element.url === '/ethereum') {
-                    markup = 
+                    markup =
                         <MenuButton><Link href={`${element.url}`}><div>{element.label}</div></Link></MenuButton>
                 } else {
-                    markup = 
+                    markup =
                         <MenuButton disabled={true}><Link href={`${element.url}`}><div>{element.label}</div></Link></MenuButton>
                 }
             } else {
-                markup = 
+                markup =
                     <MenuButton handleClick={(e) => this.handleClick(e, element.id)}>{element.label}</MenuButton>
             }
             topMenu.push(markup)
@@ -62,7 +67,7 @@ export default class MenuBar extends Component {
                     childItems.push(
                         <MenuItem onClick={this.handeleClose}>
                             <Link href={child.url}>
-                                <div style={{ color: '#ffffff', fontSize: '12px'}}>{child.label}</div>
+                                <div style={{ color: '#ffffff', fontSize: '12px' }}>{child.label}</div>
                             </Link>
                         </MenuItem>
                     )
@@ -107,7 +112,7 @@ export default class MenuBar extends Component {
                             }}
                         >
                             <Paper square={true} style={{ backgroundColor: '#004681' }}>
-                                <ClickAwayListener onClickAway={this.handeleClose}> 
+                                <ClickAwayListener onClickAway={this.handeleClose}>
                                     <MenuList>
                                         {this.state.childMenu}
                                     </MenuList>
