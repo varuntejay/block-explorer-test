@@ -72,10 +72,21 @@ router.post("/getBlockCount", async (req, res) => {
 });
 
 router.post("/filterTransactions", async (req, res) => {
-    let filterParams = req.body;
-    let filteredData = await getFilteredTransactions(filterParams);
-    console.log(filteredData)
-    res.status(200).send({ result: filteredData })
+
+    console.log(req.body)
+    const db = dbConnection.db('bitcoin_db');
+    db.collection('blocks').find().project({ "time": 1 }).sort({ "height": -1 }).limit(1).toArray( async (err, result) => {
+        getFilteredTransactions({"endTime": result[0].time, "minBtc": req.body.coins})
+        .then((filteredData) => {
+            console.log(filteredData)
+            res.status(200).send({ txns: filteredData })
+        })
+    })
+
+    // let filterParams = req.body;
+    // let filteredData = await getFilteredTransactions(filterParams);
+    // console.log(filteredData)
+    // res.status(200).send({ result: filteredData })
 
 });
 

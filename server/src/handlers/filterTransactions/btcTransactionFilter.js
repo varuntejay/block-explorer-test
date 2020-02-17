@@ -8,7 +8,7 @@ module.exports.getFilteredTransactions = async (filterParams) => {
     let minBtc = filterParams.minBtc
     if (filterParams.endTime) {
         let endTime = filterParams.endTime;
-        let startTime = filterParams.startTime || endTime - 86400;
+        let startTime = filterParams.startTime || endTime - 864000;
         let projections = {
             "projection": {
                 "_id": 0,
@@ -20,11 +20,13 @@ module.exports.getFilteredTransactions = async (filterParams) => {
         }
         let query = {
 
-            $and: [{ time: { $gt: startTime } }, { time: { $lt: endTime } }, { value: { $gt: minBtc } }]
+            $and: [{ time: { $gt: startTime } }, { time: { $lt: endTime } }, { value: { $gt: parseFloat(minBtc) } }]
 
         }
         console.log(JSON.stringify(query))
-        let filteredTransactions = await dbConnection.db("bitcoin_db").collection("transactions").find(query, projections).limit(5).toArray()
+        let filteredTransactions = await dbConnection.db("bitcoin_db").collection("transactions").find(query, projections).limit(50).toArray()
+        console.log(filteredTransactions
+            )
         return filteredTransactions
     }
 }

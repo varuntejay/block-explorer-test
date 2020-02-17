@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import '../style.css'
 import axios from 'axios';
+import lib from './../../../lib/index';
 import { Button, CircularProgress } from '@material-ui/core';
 import {
     MdKeyboardArrowLeft,
@@ -59,7 +60,7 @@ export default class Content extends Component {
                         for (var i in blocks) {
                             blocksMapTable[blocks[i].height] = {
                                 "height": blocks[i].height,
-                                "time": blocks[i].time,
+                                "time": lib.formatDate(blocks[i].time),
                                 "hash": blocks[i].hash,
                                 "tx": blocks[i].tx
                             }
@@ -182,7 +183,7 @@ export default class Content extends Component {
             markup.push(
                 <tr className="dataBorderBottom">
                     <td>{block.height}</td>
-                    <td>{block.time}</td>
+                    <td>{lib.formatDate(block.time)}</td>
                     <td style={{ fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif' }}>{block.hash}</td>
                     <td>{block.tx.length}</td>
                     <td>
@@ -231,7 +232,7 @@ export default class Content extends Component {
                         for (var i in blocks) {
                             blocksMapTable[blocks[i].height] = {
                                 "number": blocks[i].height,
-                                "timestamp": blocks[i].time,
+                                "timestamp": lib.formatDate(blocks[i].time),
                                 "hash": blocks[i].hash,
                                 "transactions": blocks[i].tx
                             }
@@ -252,60 +253,6 @@ export default class Content extends Component {
         }
     }
 
-    prepareblocksTableMarkup = (event) => {
-        let blockDetails = JSON.parse(event.target.value);
-        console.log(blockDetails);
-        let markup = [];
-        (blockDetails.trnxns).forEach((txn) => {
-            let endorsements = [];
-            if (txn.payload.hasOwnProperty('data')) {
-                if (txn.payload.data.hasOwnProperty('actions')) {
-                    if (txn.payload.data.actions.length > 0) {
-                        (txn.payload.data.actions[0].payload.action.endorsements).forEach((endorsement) => {
-                            endorsements.push(endorsement.endorser.Mspid)
-                        })
-                    }
-                }
-            }
-            markup.push(
-                <table>
-                    <tbody>
-                        <tr>
-                            <td> Txn index</td>
-                            <td>{blockDetails.transactionIndex}</td>
-                        </tr>
-                        <tr>
-                            <td> Block number</td>
-                            <td>{blockDetails.blockNumber}</td>
-                        </tr>
-                        <tr>
-                            <td> Transaction Id</td>
-                            <td>{txn.payload.header.channel_header.tx_id}</td>
-                        </tr>
-                        <tr>
-                            <td> Timestamp</td>
-                            <td>{txn.payload.header.channel_header.timestamp}</td>
-                        </tr>
-                        <tr>
-                            <td> Channel Id</td>
-                            <td>{txn.payload.header.channel_header.channel_id}</td>
-                        </tr>
-                        <tr>
-                            <td> Transaction creator Mspid</td>
-                            <td>{txn.payload.header.signature_header.creator.Mspid}</td>
-                        </tr>
-                        {endorsements.length > 0 ?
-                            <tr>
-                                <td> Transaction endorsements</td>
-                                <td>{endorsements.join(', ')}</td>
-                            </tr> : 'NA'
-                        }
-                    </tbody>
-                </table>
-            )
-        })
-        this.setState({ trasactionDetailsMarkup: markup })
-    }
 
     fetchNext = async () => {
         let latestBlockOffset = this.state.latestBlockOffset + this.state.size;
@@ -426,7 +373,7 @@ export default class Content extends Component {
                 </div>
                 <div style={{ justifyContent: 'center', width: '100%', display: (this.state.viewTransactionMarkup) ? 'flex' : 'none' }}>
                     <div style={{ width: '800px', marginRight: '15px' }}>
-                        <div className="navigator">
+                        <div className="navigator" style={{marginBottom: '0px'}}>
                             <div style={{ float: 'left', paddingLeft: '15px' }}>
                                 <button type="button" style={{ padding: '5px', marginRight: '20px' }} onClick={() => { this.setState({ viewBlockMarkup: true, viewTransactionMarkup: false }) }}>Back</button>
                                 {/* <div style={{ borderLeft: '0.5pt solid black' }}></div> */}

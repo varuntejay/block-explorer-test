@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import '../style.css'
 import axios from 'axios';
 import { Button, CircularProgress } from '@material-ui/core';
+import lib from './../../../lib/index'
 import {
     MdKeyboardArrowLeft,
     MdKeyboardArrowRight,
@@ -59,7 +60,7 @@ export default class Content extends Component {
                         for (var i in blocks) {
                             blocksMapTable[blocks[i].number] = {
                                 "number": blocks[i].number,
-                                "timestamp": blocks[i].timestamp,
+                                "timestamp": lib.formatDate(blocks[i].timestamp),
                                 "hash": blocks[i].hash,
                                 "transactions": blocks[i].transactions
                             }
@@ -184,7 +185,7 @@ export default class Content extends Component {
             markup.push(
                 <tr className="dataBorderBottom">
                     <td>{block.number}</td>
-                    <td>{block.timestamp}</td>
+                    <td>{lib.formatDate(block.timestamp)}</td>
                     <td style={{ fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif' }}>{block.hash}</td>
                     <td>{block.transactions.length}</td>
                     <td>
@@ -252,61 +253,6 @@ export default class Content extends Component {
         } catch (err) {
             throw new Error('Failed to fetch transactions')
         }
-    }
-
-    prepareblocksTableMarkup = (event) => {
-        let blockDetails = JSON.parse(event.target.value);
-        console.log(blockDetails);
-        let markup = [];
-        (blockDetails.trnxns).forEach((txn) => {
-            let endorsements = [];
-            if (txn.payload.hasOwnProperty('data')) {
-                if (txn.payload.data.hasOwnProperty('actions')) {
-                    if (txn.payload.data.actions.length > 0) {
-                        (txn.payload.data.actions[0].payload.action.endorsements).forEach((endorsement) => {
-                            endorsements.push(endorsement.endorser.Mspid)
-                        })
-                    }
-                }
-            }
-            markup.push(
-                <table>
-                    <tbody>
-                        <tr>
-                            <td> Txn index</td>
-                            <td>{blockDetails.transactionIndex}</td>
-                        </tr>
-                        <tr>
-                            <td> Block number</td>
-                            <td>{blockDetails.blockNumber}</td>
-                        </tr>
-                        <tr>
-                            <td> Transaction Id</td>
-                            <td>{txn.payload.header.channel_header.tx_id}</td>
-                        </tr>
-                        <tr>
-                            <td> Timestamp</td>
-                            <td>{txn.payload.header.channel_header.timestamp}</td>
-                        </tr>
-                        <tr>
-                            <td> Channel Id</td>
-                            <td>{txn.payload.header.channel_header.channel_id}</td>
-                        </tr>
-                        <tr>
-                            <td> Transaction creator Mspid</td>
-                            <td>{txn.payload.header.signature_header.creator.Mspid}</td>
-                        </tr>
-                        {endorsements.length > 0 ?
-                            <tr>
-                                <td> Transaction endorsements</td>
-                                <td>{endorsements.join(', ')}</td>
-                            </tr> : 'NA'
-                        }
-                    </tbody>
-                </table>
-            )
-        })
-        this.setState({ trasactionDetailsMarkup: markup })
     }
 
     fetchNext = async () => {
