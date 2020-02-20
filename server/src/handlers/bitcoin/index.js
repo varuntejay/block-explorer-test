@@ -1,6 +1,6 @@
 const express = require('express');
 const { getConnection } = require('../../lib/mongo')
-const { getFilteredTransactions } = require('./../filterTransactions/btcTransactionFilter')
+const { getFilteredTransactions, getStats } = require('./../filterTransactions/btcTransactionFilter')
 const router = express.Router();
 let dbConnection;
 getConnection()
@@ -75,12 +75,12 @@ router.post("/filterTransactions", async (req, res) => {
 
     console.log(req.body)
     const db = dbConnection.db('bitcoin_db');
-    db.collection('blocks').find().project({ "time": 1 }).sort({ "height": -1 }).limit(1).toArray( async (err, result) => {
-        getFilteredTransactions({"endTime": result[0].time, "minBtc": req.body.coins})
-        .then((filteredData) => {
-            console.log(filteredData)
-            res.status(200).send({ txns: filteredData })
-        })
+    db.collection('blocks').find().project({ "time": 1 }).sort({ "height": -1 }).limit(1).toArray(async (err, result) => {
+        getFilteredTransactions({ "endTime": result[0].time, "minBtc": req.body.coins })
+            .then((filteredData) => {
+                console.log(filteredData)
+                res.status(200).send({ txns: filteredData })
+            })
     })
 
     // let filterParams = req.body;
@@ -88,6 +88,13 @@ router.post("/filterTransactions", async (req, res) => {
     // console.log(filteredData)
     // res.status(200).send({ result: filteredData })
 
+});
+
+router.post("/getStats", async (req, res) => {
+    console.log(req.body)
+    let stats = await getStats(req.body.timeUnit)
+    console.log(stats)
+    res.status(200).send(stats)
 });
 
 module.exports = router;

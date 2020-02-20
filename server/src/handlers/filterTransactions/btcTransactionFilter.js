@@ -1,4 +1,8 @@
 const { getConnection } = require('../../lib/mongo');
+const moment = require('moment');
+const {
+    BTC_FIRST_BLOCK_DATE
+} = require('../../globalconfig')
 let dbConnection;
 getConnection()
     .then((result) => {
@@ -26,7 +30,23 @@ module.exports.getFilteredTransactions = async (filterParams) => {
         console.log(JSON.stringify(query))
         let filteredTransactions = await dbConnection.db("bitcoin_db").collection("transactions").find(query, projections).limit(50).toArray()
         console.log(filteredTransactions
-            )
+        )
         return filteredTransactions
     }
+}
+
+module.exports.getStats = async (timeUnit) => {
+    let latestBlockDetails = await dbConnection.db("bitcoin_db").collection('blocks').find().project({ "height": 1, "time": 1 }).sort({ "height": -1 }).limit(1).toArray()
+    let transactionStats = await dbConnection.db("bitcoin_db").collection('transactions').stats()
+    let transactionCount = transactionStats.count
+    console.log(latestBlockDetails)
+    let daysSinceFirstBlock = moment.unix(latestBlockDetails[0]["time"]).diff(moment.unix(BTC_FIRST_BLOCK_DATE), "days")
+    console.log(daysSinceFirstBlock, timeUnit, transactionCount, latestBlockDetails)
+    let result = {
+        avgNoOfBlocks: latestBlockDetails[0]["height"] * timeUnit / daysSinceFirstBlock,
+        avgNoTransactions: transactionCount * timeUnit / daysSinceFirstBlock,
+        totalNumberOfTransactions: transactionCount
+    }
+    console.log(result)
+    return result
 }
