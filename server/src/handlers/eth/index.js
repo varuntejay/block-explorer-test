@@ -1,6 +1,6 @@
 const express = require('express');
 const { getConnection } = require('../../lib/mongo')
-const { getFilteredTransactions } = require('./../filterTransactions/transactionFilter')
+const { getFilteredTransactions, getStats } = require('./../filterTransactions/transactionFilter')
 const router = express.Router();
 let dbConnection;
 getConnection()
@@ -95,13 +95,20 @@ router.post("/getBlockCount", async (req, res) => {
 router.post("/filterTransactions", async (req, res) => {
     console.log(req.body)
     const db = dbConnection.db('eth_db');
-    db.collection('blocks').find().project({ "timestamp": 1 }).sort({ "number": -1 }).limit(1).toArray( async (err, result) => {
-        getFilteredTransactions({"endTime": result[0].timestamp, "minEth": req.body.coins})
-        .then((filteredData) => {
-            console.log(filteredData)
-            res.status(200).send({ txns: filteredData })
-        })
+    db.collection('blocks').find().project({ "timestamp": 1 }).sort({ "number": -1 }).limit(1).toArray(async (err, result) => {
+        getFilteredTransactions({ "endTime": result[0].timestamp, "minEth": req.body.coins })
+            .then((filteredData) => {
+                console.log(filteredData)
+                res.status(200).send({ txns: filteredData })
+            })
     })
+});
+
+router.post("/getStats", async (req, res) => {
+    console.log(req.body)
+    let stats = await getStats(req.body.timeUnit)
+    console.log(stats)
+    res.status(200).send(stats)
 });
 
 module.exports = router;
