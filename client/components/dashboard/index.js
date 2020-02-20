@@ -1,7 +1,19 @@
 import React, { Component } from 'react';
 import './style.css'
 import axios from 'axios';
-import { FormControl, InputLabel, TextField, Select, MenuItem, CircularProgress, Tooltip, Button } from '@material-ui/core';
+import {
+    FormControl,
+    FormGroup,
+    InputLabel,
+    TextField,
+    Select,
+    MenuItem,
+    CircularProgress,
+    Tooltip,
+    Button,
+    Checkbox,
+    FormControlLabel
+} from '@material-ui/core';
 import {
     MdKeyboardArrowLeft,
     MdKeyboardArrowRight,
@@ -19,17 +31,29 @@ export default class Dashboard extends Component {
             trasactionDetailsMarkup: "",
             coinType: "",
             coins: 0.1,
-            errorFields: []
+            errorFields: [],
+            statsOn: 'daily'
         }
         this.API_URL = publicRuntimeConfig.API_URL
         this.circularProgress = <CircularProgress style={{ fontSize: '20px' }} />
         this.noDataMarkup = <div style={{ marginTop: '15px', textAlign: 'center', fontSize: '30px', color: '#ffffff' }}>No transactions found</div>
     }
 
-    componentDidMount() { }
+    componentDidMount() {
+        this.getStats('daily')
+    }
 
     handleChange = (event) => {
         this.setState({ [event.target.name]: event.target.value })
+    }
+
+    handleCheckbox = (event) => {
+        this.setState({ [event.target.name]: event.target.value })
+        this.getStats(event.target.value)
+    }
+
+    getStats = (period) => {
+        console.log(period)
     }
 
     viewDetails = () => {
@@ -95,9 +119,6 @@ export default class Dashboard extends Component {
     prepareTableMarkup = (txns) => {
         let rowsMarkup = []
         txns.forEach((txn, index) => {
-            console.log('***************')
-            console.log(txn);
-            console.log(txn.height);
             if (this.state.coinType === 'eth' && txn !== undefined) {
                 if (index == 0) {
                     this.getTransactionDetail(txn.transactionIndex, txn.blockNumber)
@@ -137,7 +158,7 @@ export default class Dashboard extends Component {
             <tbody>
                 <tr className="borderBottom">
                     <th>Block Number</th>
-                    <th>Hash</th>
+                    <th>Txn Hash</th>
                     <th>Value ({this.state.coinType === "eth" ? 'Ether' : 'BTC '})</th>
                     <th>Transaction details</th>
                 </tr>
@@ -253,7 +274,6 @@ export default class Dashboard extends Component {
         })
     }
 
-
     fetchPrev = async () => {
 
         let fromTxnNumber = this.state.fromTxnNumber - 10
@@ -270,13 +290,90 @@ export default class Dashboard extends Component {
         })
     }
 
+
+
     render() {
         return (
             <div style={{ display: 'flex', marginTop: '20px', fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif' }}>
                 <div style={{ justifyContent: 'center', width: '100%', display: 'inline-grid' }}>
-                    <div className="navigator" style={{ width: '1500px', paddingBottom: '16px' }}>
+                    <div className="navigator" style={{ width: '1500px', paddingBottom: '16px', height: '30px' }}>
                         <div style={{ float: 'left', paddingLeft: '15px' }}>
-                            <span style={{ fontSize: '30px' }}>Dashboard&nbsp;-&nbsp;Fetch latest block time 24 hours transactions</span>
+                            <span style={{ fontSize: '30px' }}>Dashboard</span>
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'inline !important', color: '#ffffff', float: 'left' }}>
+                        <FormGroup style={{ display: 'inline', color: '#ffffff', float: 'left' }}>
+                            <FormControlLabel
+                                label="Daily"
+                                labelPlacement="start"
+                                control={
+                                    <Checkbox
+                                        checked={(this.state.statsOn === 'daily')}
+                                        value="daily"
+                                        name="statsOn"
+                                        style={{ color: '#ffffff' }}
+                                        onChange={this.handleCheckbox}
+                                    />
+                                }
+                            />
+                            <FormControlLabel
+                                label="Weekly"
+                                labelPlacement="start"
+                                control={
+                                    <Checkbox
+                                        checked={(this.state.statsOn === 'weekly')}
+                                        value="weekly"
+                                        name="statsOn"
+                                        style={{ color: '#ffffff' }}
+                                        onChange={this.handleCheckbox}
+                                    />
+                                }
+                            />
+                            <FormControlLabel
+                                label="Monthly"
+                                labelPlacement="start"
+                                control={
+                                    <Checkbox
+                                        checked={(this.state.statsOn === 'monthly')}
+                                        value="monthly"
+                                        name="statsOn"
+                                        style={{ color: '#ffffff' }}
+                                        onChange={this.handleCheckbox}
+                                    />
+                                }
+                            />
+                        </FormGroup>
+
+                    </div>
+                    <table style={{width: '1500px', marginBottom: '20px'}}>
+                        <tbody>
+                            <tr>
+                                <th>Crypto type</th>
+                                <th>Txns Volume</th>
+                                <th>Avg NO of Txns</th>
+                                <th>Avg NO of Blocks</th>
+                                <th>Rewards</th>
+                            </tr>
+                            <tr>
+                                <td>Bitcoin</td>
+                                <td>{this.state.bitcoinTotalTxns}</td>
+                                <td>{this.state.bitcoinAvgTxns}</td>
+                                <td>{this.state.bitCoinAvgBloks}</td>
+                                <td>12.5* (BTC)</td>
+                            </tr>
+                            <tr>
+                                <td>Ethereum</td>
+                                <td>{this.state.ethTotalTxns}</td>
+                                <td>{this.state.ethAvgTxns}</td>
+                                <td>{this.state.ethAvgBlocks}</td>
+                                <td>2* (Ether)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div className="navigator" style={{ width: '1500px', paddingBottom: '16px', height: '25px' }}>
+                        <div style={{ float: 'left', paddingLeft: '15px' }}>
+                            <span style={{ fontSize: '25px' }}>Fetch latest block time 24 hours transactions</span>
                         </div>
                     </div>
                     <div>

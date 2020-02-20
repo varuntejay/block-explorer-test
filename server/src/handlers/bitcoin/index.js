@@ -52,12 +52,20 @@ router.post('/getTxnDetails', async (req, res) => {
 
 router.post("/deleteDocument", async (req, res) => {
 
-    // const db = dbConnection.db('eth_db');
-    // db.collection('blocks').deleteOne({ "_id": new mongodb.ObjectID("5e44e61b4f46132edef842e2")}, (err, result) => {
+    const db = dbConnection.db('bitcoin_db');
+    // db.collection('transactions').find({ "height": {"$gt" : 440552}}).project({"height": 1}).toArray((err, result) => {
     //     console.error(err)
     //     console.log(result);
     //     res.send({staus: true, result: result})
     // })
+
+    db.collection('transactions').deleteMany({ "height": {"$gt" : 438002}}, (err, result) => {
+        console.error(err)
+        console.log(result);
+        res.send({staus: true, result: result})
+    })
+
+
 
 })
 

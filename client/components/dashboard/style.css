@@ -71,6 +71,11 @@ table {
     border-collapse: collapse;    
 }
 
+table tr:first-child {
+    border-bottom:2pt solid black;
+    font-size: 20px;
+}
+
 tr:nth-child(2n + 2) td {
     background-color: #343d4682;
 }
