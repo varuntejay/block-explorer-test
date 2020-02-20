@@ -45,6 +45,13 @@ module.exports.getFilteredTransactions = async (filterParams) => {
 module.exports.getStats = async (timeUnit) => {
     let latestBlockDetails = await dbConnection.db("eth_db").collection('blocks').find().project({ "number": 1, "timestamp": 1 }).sort({ "number": -1 }).limit(1).toArray()
     let transactionStats = await dbConnection.db("eth_db").collection('transactions').stats()
+    
+
+    let timestamp = moment.unix(latestBlockDetails[0]["timestamp"]).subtract( timeUnit -1, 'days').startOf('day').unix();
+    // console.log(timestamp)
+    let blockNumber = await dbConnection.db("eth_db").collection('blocks').find({"timestamp": {"$gt" : timestamp}}).project({"number": 1}).sort({"number": 1}).limit(1).toArray()
+    // console.log(blockNumber[0].number)
+    let count = await dbConnection.db("eth_db").collection('transactions').count({"blockNumber": {"$gte" : blockNumber[0].number}})
     let transactionCount = transactionStats.count
     // console.log(latestBlockDetails)
     let daysSinceFirstBlock = moment.unix(latestBlockDetails[0]["timestamp"]).diff(moment.unix(ETH_FIRST_BLOCK_DATE), "days")
@@ -52,7 +59,7 @@ module.exports.getStats = async (timeUnit) => {
     let result = {
         avgNoOfBlocks: parseInt(latestBlockDetails[0]["number"] * timeUnit / daysSinceFirstBlock),
         avgNoTransactions: parseInt(transactionCount * timeUnit / daysSinceFirstBlock),
-        totalNumberOfTransactions: transactionCount
+        totalNumberOfTransactions: count
     }
     // console.log(result)
     return result

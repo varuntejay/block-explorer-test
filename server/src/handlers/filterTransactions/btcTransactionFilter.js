@@ -38,13 +38,17 @@ module.exports.getFilteredTransactions = async (filterParams) => {
 module.exports.getStats = async (timeUnit) => {
     let latestBlockDetails = await dbConnection.db("bitcoin_db").collection('blocks').find().project({ "height": 1, "time": 1 }).sort({ "height": -1 }).limit(1).toArray()
     let transactionStats = await dbConnection.db("bitcoin_db").collection('transactions').stats()
-    let transactionCount = transactionStats.count
-    console.log(latestBlockDetails)
+
+    let timestamp = moment.unix(latestBlockDetails[0]["time"]).subtract( timeUnit -1, 'days').startOf('day').unix();
+    let count = await dbConnection.db("bitcoin_db").collection('transactions').count({time: {"$gte" : timestamp}})
+    
+    let totalTransactionCount = transactionStats.count
     let daysSinceFirstBlock = moment.unix(latestBlockDetails[0]["time"]).diff(moment.unix(BTC_FIRST_BLOCK_DATE), "days")
+
    let result = {
         avgNoOfBlocks: parseInt(latestBlockDetails[0]["height"] * timeUnit / daysSinceFirstBlock),
-        avgNoTransactions: parseInt(transactionCount * timeUnit / daysSinceFirstBlock),
-        totalNumberOfTransactions: transactionCount
+        avgNoTransactions: parseInt(totalTransactionCount * timeUnit / daysSinceFirstBlock),
+        totalNumberOfTransactions: count
     }
     console.log(result)
     return result
