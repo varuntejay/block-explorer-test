@@ -53,7 +53,32 @@ export default class Dashboard extends Component {
     }
 
     getStats = (period) => {
-        console.log(period)
+        let timeUnit = 1;
+        if (period === 'weekly') timeUnit = 7;
+        if (period === 'monthly') timeUnit = 20;
+
+        let params = {
+            "timeUnit": timeUnit;
+        }
+        axios.post(`${this.API_URL}/eth/getStats`).
+            then((response) => {
+                let data = response.data;
+                this.setState({
+                    ethTotalTxns: data.totalNumberOfTransactions,
+                    ethAvgTxns: data.avgNoTransactions,
+                    ethAvgBlocks: data.avgNoOfBlocks
+                })
+            })
+
+        axios.post(`${this.API_URL}/bitcoin/getStats`).
+            then((response) => {
+                let data = response.data;
+                this.setState({
+                    bitcoinTotalTxns: data.totalNumberOfTransactions,
+                    bitcoinAvgTxns: data.avgNoTransactions,
+                    bitcoinAvgBlocks: data.avgNoOfBlocks
+                })
+            })
     }
 
     viewDetails = () => {
@@ -346,7 +371,7 @@ export default class Dashboard extends Component {
                         </FormGroup>
 
                     </div>
-                    <table style={{width: '1500px', marginBottom: '20px'}}>
+                    <table style={{ width: '1500px', marginBottom: '20px' }}>
                         <tbody>
                             <tr>
                                 <th>Crypto type</th>
