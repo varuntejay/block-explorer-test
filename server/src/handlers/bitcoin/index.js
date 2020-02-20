@@ -100,7 +100,7 @@ router.post("/filterTransactions", async (req, res) => {
 
 router.post("/getStats", async (req, res) => {
     console.log(req.body)
-    let stats = await getStats(req.body.timeUnit)
+    let stats = await getStats(parseInt(req.body.timeUnit))
     console.log(stats)
     res.status(200).send(stats)
 });

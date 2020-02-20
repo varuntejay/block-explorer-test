@@ -58,10 +58,10 @@ export default class Dashboard extends Component {
         if (period === 'monthly') timeUnit = 20;
 
         let params = {
-            "timeUnit": timeUnit;
+            "timeUnit": timeUnit
         }
-        axios.post(`${this.API_URL}/eth/getStats`).
-            then((response) => {
+        axios.post(`${this.API_URL}/eth/getStats`, params)
+            .then((response) => {
                 let data = response.data;
                 this.setState({
                     ethTotalTxns: data.totalNumberOfTransactions,
@@ -70,8 +70,8 @@ export default class Dashboard extends Component {
                 })
             })
 
-        axios.post(`${this.API_URL}/bitcoin/getStats`).
-            then((response) => {
+        axios.post(`${this.API_URL}/bitcoin/getStats`, params)
+        .then((response) => {
                 let data = response.data;
                 this.setState({
                     bitcoinTotalTxns: data.totalNumberOfTransactions,
@@ -384,7 +384,7 @@ export default class Dashboard extends Component {
                                 <td>Bitcoin</td>
                                 <td>{this.state.bitcoinTotalTxns}</td>
                                 <td>{this.state.bitcoinAvgTxns}</td>
-                                <td>{this.state.bitCoinAvgBloks}</td>
+                                <td>{this.state.bitcoinAvgBlocks}</td>
                                 <td>12.5* (BTC)</td>
                             </tr>
                             <tr>

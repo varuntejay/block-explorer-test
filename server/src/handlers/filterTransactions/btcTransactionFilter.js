@@ -41,10 +41,9 @@ module.exports.getStats = async (timeUnit) => {
     let transactionCount = transactionStats.count
     console.log(latestBlockDetails)
     let daysSinceFirstBlock = moment.unix(latestBlockDetails[0]["time"]).diff(moment.unix(BTC_FIRST_BLOCK_DATE), "days")
-    console.log(daysSinceFirstBlock, timeUnit, transactionCount, latestBlockDetails)
-    let result = {
-        avgNoOfBlocks: latestBlockDetails[0]["height"] * timeUnit / daysSinceFirstBlock,
-        avgNoTransactions: transactionCount * timeUnit / daysSinceFirstBlock,
+   let result = {
+        avgNoOfBlocks: parseInt(latestBlockDetails[0]["height"] * timeUnit / daysSinceFirstBlock),
+        avgNoTransactions: parseInt(transactionCount * timeUnit / daysSinceFirstBlock),
         totalNumberOfTransactions: transactionCount
     }
     console.log(result)

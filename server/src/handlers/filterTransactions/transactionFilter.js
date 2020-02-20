@@ -46,14 +46,14 @@ module.exports.getStats = async (timeUnit) => {
     let latestBlockDetails = await dbConnection.db("eth_db").collection('blocks').find().project({ "number": 1, "timestamp": 1 }).sort({ "number": -1 }).limit(1).toArray()
     let transactionStats = await dbConnection.db("eth_db").collection('transactions').stats()
     let transactionCount = transactionStats.count
-    console.log(latestBlockDetails)
+    // console.log(latestBlockDetails)
     let daysSinceFirstBlock = moment.unix(latestBlockDetails[0]["timestamp"]).diff(moment.unix(ETH_FIRST_BLOCK_DATE), "days")
-    console.log(daysSinceFirstBlock, timeUnit, transactionCount, latestBlockDetails)
+    // console.log(daysSinceFirstBlock, timeUnit, transactionCount, latestBlockDetails)
     let result = {
-        avgNoOfBlocks: latestBlockDetails[0]["number"] * timeUnit / daysSinceFirstBlock,
-        avgNoTransactions: transactionCount * timeUnit / daysSinceFirstBlock,
+        avgNoOfBlocks: parseInt(latestBlockDetails[0]["number"] * timeUnit / daysSinceFirstBlock),
+        avgNoTransactions: parseInt(transactionCount * timeUnit / daysSinceFirstBlock),
         totalNumberOfTransactions: transactionCount
     }
-    console.log(result)
+    // console.log(result)
     return result
 }
