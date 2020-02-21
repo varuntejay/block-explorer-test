@@ -55,17 +55,18 @@ router.post('/add', async (req, res) => {
     }
 })
 
-router.post('/get', async (req,res) => {
+router.post('/get', async (req, res) => {
     const ethDB = dbConnection.db('eth_db');
     const btcDB = dbConnection.db('bitcoin_db')
 
     let timestamp = moment().startOf('day').unix()
     console.log(timestamp)
-    let eth = await ethDB.collection('prices').find({"timestamp": timestamp}).toArray();
-    let btc = await btcDB.collection('prices').find({"timestamp": timestamp}).toArray();
+    // let eth = await ethDB.collection('prices').find({ "timestamp": timestamp }).toArray();
+    // let btc = await btcDB.collection('prices').find({ "timestamp": timestamp }).toArray();
+    let eth = 266.812336
+    let btc = 9728.123146
 
-
-    res.send({status: true, eth: eth[0], btc: btc[0]})
+    res.send({ status: true, eth: eth[0], btc: btc[0] })
 })
 
 module.exports = router;
