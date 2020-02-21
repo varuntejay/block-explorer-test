@@ -41,6 +41,13 @@ export default class Dashboard extends Component {
 
     componentDidMount() {
         this.getStats('daily')
+        axios.post(`${this.API_URL}/price/get`)
+        .then((response) => {
+            this.setState({
+                ethPrice: response.data.eth.price,
+                btcPrice: response.data.btc.price
+            })
+        })
     }
 
     handleChange = (event) => {
@@ -327,7 +334,7 @@ export default class Dashboard extends Component {
                         </div>
                     </div>
 
-                    <div style={{ display: 'inline !important', color: '#ffffff', float: 'left' }}>
+                    <div style={{ display: 'inline !important', color: '#ffffff' }}>
                         <FormGroup style={{ display: 'inline', color: '#ffffff', float: 'left' }}>
                             <FormControlLabel
                                 label="Daily"
@@ -369,7 +376,10 @@ export default class Dashboard extends Component {
                                 }
                             />
                         </FormGroup>
-
+                        <div style={{float: 'right', fontSize: '20px'}}>
+                            <span style={{paddingRight: '20px'}}>Bitcoin&nbsp;${this.state.btcPrice}</span>
+                            <span>Ethereum&nbsp;${this.state.ethPrice}</span>
+                        </div>                    
                     </div>
                     <table style={{ width: '1500px', marginBottom: '20px' }}>
                         <tbody>

@@ -2,6 +2,7 @@ const express                       = require('express');
 const bodyParser                    = require('body-parser');
 const ethHandler                    = require('./src/handlers/eth');
 const bitcoinHandler                = require('./src/handlers/bitcoin');
+const priceHandler                  = require('./src/handlers/price')
 
 
 const app               = express();
@@ -28,6 +29,7 @@ registerRoutes = () => {
 
     app.use('/eth', ethHandler);
     app.use('/bitcoin', bitcoinHandler)    
+    app.use('/price', priceHandler)
 }
 
 server = () => {
