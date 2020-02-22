@@ -61,11 +61,11 @@ router.post('/get', async (req, res) => {
 
     let timestamp = moment().startOf('day').unix()
     console.log(timestamp)
-    // let eth = await ethDB.collection('prices').find({ "timestamp": timestamp }).toArray();
-    // let btc = await btcDB.collection('prices').find({ "timestamp": timestamp }).toArray();
-    let eth = 266.812336
-    let btc = 9728.123146
-
+    let eth = await ethDB.collection('prices').find().sort({ "timestamp": -1 }).limit(1).toArray();
+    let btc = await btcDB.collection('prices').find().sort({ "timestamp": -1 }).limit(1).toArray();
+    // let eth = 266.812336
+    // let btc = 9728.123146
+    console.log(eth, btc)
     res.send({ status: true, eth: eth[0], btc: btc[0] })
 })
 
