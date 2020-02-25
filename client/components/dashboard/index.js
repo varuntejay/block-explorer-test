@@ -378,8 +378,8 @@ export default class Dashboard extends Component {
                             />
                         </FormGroup>
                         <div style={{ float: 'right', fontSize: '20px' }}>
-                            <span style={{ paddingRight: '20px' }}>Bitcoin&nbsp;$9650.167339</span>
-                            <span>Ethereum&nbsp;$261.172476</span>
+                            <span style={{ paddingRight: '20px' }}>Bitcoin&nbsp;${this.state.btcPrice}</span>
+                            <span>Ethereum&nbsp;${this.state.ethPrice}</span>
                         </div>
                     </div>
                     <table style={{ width: '1500px', marginBottom: '20px' }}>
