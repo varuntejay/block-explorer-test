@@ -1,6 +1,6 @@
 const express = require('express');
 const { getConnection } = require('../../lib/mongo')
-const { getFilteredTransactions, getStats } = require('./../filterTransactions/btcTransactionFilter')
+const { getFilteredTransactions, getStats, getLatestHighlights } = require('./../filterTransactions/btcTransactionFilter')
 const router = express.Router();
 let dbConnection;
 getConnection()
@@ -59,10 +59,10 @@ router.post("/deleteDocument", async (req, res) => {
     //     res.send({staus: true, result: result})
     // })
 
-    db.collection('transactions').deleteMany({ "height": {"$gt" : 438002}}, (err, result) => {
+    db.collection('transactions').deleteMany({ "height": { "$gt": 438002 } }, (err, result) => {
         console.error(err)
         console.log(result);
-        res.send({staus: true, result: result})
+        res.send({ staus: true, result: result })
     })
 })
 
@@ -75,10 +75,10 @@ router.post("/deleteDocument", async (req, res) => {
     //     res.send({staus: true, result: result})
     // })
 
-    db.collection('transactions').deleteMany({ "height": {"$gt" : 438002}}, (err, result) => {
+    db.collection('transactions').deleteMany({ "height": { "$gt": 438002 } }, (err, result) => {
         console.error(err)
         console.log(result);
-        res.send({staus: true, result: result})
+        res.send({ staus: true, result: result })
     })
 })
 
@@ -118,4 +118,9 @@ router.post("/getStats", async (req, res) => {
     res.status(200).send(stats)
 });
 
+router.post("/getLatestHighlights", async (req, res) => {
+    console.log(req.body);
+    let result = await getLatestHighlights(req.body.endTime, req.body.hours)
+    res.status(200).send(result)
+});
 module.exports = router;
