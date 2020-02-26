@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Layout from '../components/layout';
-import MainDashboard from '../components/maindashboard'
+import Dashboard from '../components/dashboard'
 
 export default class Index extends Component {
     constructor() {
@@ -11,7 +11,7 @@ export default class Index extends Component {
     render() {
         return (
             <Layout>
-                <MainDashboard />
+                <Dashboard />
             </Layout>
         )
     }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import '../style.css'
 import axios from 'axios';
-import { Button, CircularProgress } from '@material-ui/core';
+import { Button, CircularProgress, Select, MenuItem } from '@material-ui/core';
 import lib from './../../../lib/index'
 import {
     MdKeyboardArrowLeft,
@@ -37,7 +37,11 @@ export default class Content extends Component {
 
     componentDidMount() {
         this.refreshBlockDetails();
-        console.log(publicRuntimeConfig)
+    }
+
+    handleChange = (event) => {
+        this.setState({ [event.target.name]: event.target.value })
+        this.refreshBlockDetails();
     }
 
     refreshBlockDetails = async () => {
@@ -342,6 +346,23 @@ export default class Content extends Component {
                                     <MdRefresh style={{ fontSize: '30px' }} />
                                 </Button>
                             </Tooltip>
+                            <div style={{ borderLeft: '0.5pt solid black' }}></div>
+
+                            <div style={{marginTop: '12px'}}>
+                                <span style={{ fontSize: '20px', color:'#ffffff', marginRight: '10px'}}>Rows per page</span>
+                                <Select
+                                    value={this.state.size}
+                                    name="size"
+                                    onChange={this.handleChange}
+                                    style={{color: '#000000', backgroundColor: '#ffffff', paddingLeft: '10px'}}
+                                >
+                                    <MenuItem value={10}>10</MenuItem>
+                                    <MenuItem value={20}>20</MenuItem>
+                                    <MenuItem value={30}>30</MenuItem>
+                                    <MenuItem value={40}>40</MenuItem>
+                                </Select>
+                            </div>
+
                             <div style={{ borderLeft: '0.5pt solid black' }}></div>
 
 

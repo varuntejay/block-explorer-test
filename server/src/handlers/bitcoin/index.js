@@ -50,37 +50,18 @@ router.post('/getTxnDetails', async (req, res) => {
 })
 
 
-router.post("/deleteDocument", async (req, res) => {
+// router.post("/deleteDocument", async (req, res) => {
 
-    const db = dbConnection.db('bitcoin_db');
-    // db.collection('transactions').find({ "height": {"$gt" : 440552}}).project({"height": 1}).toArray((err, result) => {
-    //     console.error(err)
-    //     console.log(result);
-    //     res.send({staus: true, result: result})
-    // })
+//     const db = dbConnection.db('bitcoin_db');
+    
+//     db.collection('blocks').deleteMany({ "height": {"$eq" : 438002}}, (err, result) => {
+//         console.error(err)
+//         console.log(result);
+//         res.send({staus: true, result: result})
+//     })
+// })
 
-    db.collection('transactions').deleteMany({ "height": {"$gt" : 438002}}, (err, result) => {
-        console.error(err)
-        console.log(result);
-        res.send({staus: true, result: result})
-    })
-})
 
-router.post("/deleteDocument", async (req, res) => {
-
-    const db = dbConnection.db('bitcoin_db');
-    // db.collection('transactions').find({ "height": {"$gt" : 440552}}).project({"height": 1}).toArray((err, result) => {
-    //     console.error(err)
-    //     console.log(result);
-    //     res.send({staus: true, result: result})
-    // })
-
-    db.collection('transactions').deleteMany({ "height": {"$gt" : 438002}}, (err, result) => {
-        console.error(err)
-        console.log(result);
-        res.send({staus: true, result: result})
-    })
-})
 
 router.post("/getBlockCount", async (req, res) => {
 
