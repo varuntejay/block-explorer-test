@@ -64,16 +64,18 @@ module.exports.getLatestHighlights = async (endTime, hours) => {
             "value": 1,
             "height": 1,
             "txnIndex": 1,
-            "hash": 1
+            "hash": 1,
+            "time": 1
         }
     }
+    console.log(projections)
     let query = {
 
         $and: [{ time: { $gt: startTime } }, { time: { $lt: endTime } }]
 
     }
     console.log(JSON.stringify(query))
-    let filteredTransactions = await dbConnection.db("bitcoin_db").collection("transactions").find(query, projections).sort({ "vout.0.value": -1 }).limit(100).toArray()
+    let filteredTransactions = await dbConnection.db("bitcoin_db").collection("transactions").find(query, projections).sort({ "value": -1 }).limit(100).toArray()
     console.log(filteredTransactions.length)
     return filteredTransactions
 }

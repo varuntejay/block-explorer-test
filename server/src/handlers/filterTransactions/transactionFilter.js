@@ -70,29 +70,31 @@ module.exports.getLatestHighlights = async (endTime, hours) => {
     endTime = parseInt(endTime || moment().unix())
     hours = parseInt(hours || 24)
     let startTime = endTime - hours * 60 * 60;
-    let query = {
+    // let query = {
 
-        $and: [{ timestamp: { $gt: startTime } }, { timestamp: { $lt: endTime } }]
+    //     $and: [{ timestamp: { $gt: startTime } }, { timestamp: { $lt: endTime } }]
 
-    }
+    // }
+
+    let query = {timestamp: { $gte: startTime}};
 
     console.log(JSON.stringify(query))
-    let filteredBlocks = await dbConnection.db("eth_db").collection("blocks").find(query, { projection: { "_id": 0, "number": 1 } }).toArray()
-    console.log(filteredBlocks.length)
-    let minBlock = filteredBlocks[filteredBlocks.length - 1].number
-    let maxBlock = filteredBlocks[0].number;
-    query = {
-        $and: [{ blockNumber: { $gt: minBlock } }, { blockNumber: { $lt: maxBlock } }]
-    }
+    let filteredBlocks = await dbConnection.db("eth_db").collection("blocks").find(query, { projection: { "_id": 0, "number": 1 } }).sort({"number": 1}).limit(1).toArray()
+    // console.log(filteredBlocks.length)
+    // let minBlock = filteredBlocks[filteredBlocks.length - 1].number
+    // let maxBlock = filteredBlocks[0].number;
+    // query = {
+    //     $and: [{ blockNumber: { $gt: minBlock } }, { blockNumber: { $lt: maxBlock } }]
+    // }
     let projections = {
         "projection": {
             "hash": 1,
             "value": 1,
             "blockNumber": 1,
+            "timestamp": 1,
             "transactionIndex": 1
         }
     }
-    console.log(JSON.stringify(query))
-    let filteredTransactions = await dbConnection.db("eth_db").collection("transactions").find(query, projections).sort({ "value": -1 }).limit(100).toArray();
+    let filteredTransactions = await dbConnection.db("eth_db").collection("transactions").find({"blockNumber": {$gt: filteredBlocks[0].number}}, projections).sort({ "value": -1 }).limit(100).toArray();
     return filteredTransactions
 }

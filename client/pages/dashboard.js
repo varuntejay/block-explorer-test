@@ -11,7 +11,7 @@ export default class Index extends Component {
     render() {
         return (
             <Layout>
-                <MainDashboard />
+                <MainDashboard/>
             </Layout>
         )
     }

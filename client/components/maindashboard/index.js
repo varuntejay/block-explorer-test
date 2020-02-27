@@ -23,6 +23,8 @@ import {
     FaSortAmountDown,
     FaSortAmountUp
 } from "react-icons/fa"
+import lodash from 'lodash'
+import lib from './../../lib/index'
 
 
 import getConfig from 'next/config';
@@ -38,10 +40,12 @@ export default class MainDashboard extends Component {
             coins: 0.1,
             errorFields: [],
             statsOn: 'daily',
-            ethTimestampDescSort: true,
-            ethValueDescSort: true,
-            btcTimestampDescSort: true,
-            btcValueDescSort: true
+            ethTimestampDescSort: false,
+            ethValueDescSort: false,
+            btcTimestampDescSort: false,
+            btcValueDescSort: false,
+            fromTxnNumberBtc: 0,
+            toTxnNumberBtc: 0,
         }
         this.API_URL = publicRuntimeConfig.API_URL
         this.circularProgress = <CircularProgress style={{ fontSize: '20px' }} />
@@ -50,6 +54,8 @@ export default class MainDashboard extends Component {
 
     componentDidMount() {
         this.getStats('daily')
+        this.getBtcTxns()
+        this.getEthTxns()
         axios.post(`${this.API_URL}/price/get`)
             .then((response) => {
                 console.log(response)
@@ -61,19 +67,99 @@ export default class MainDashboard extends Component {
     }
 
     getBtcTxns() {
-        axios.post(`${this.API_URL}/price/get`)
+        axios.post(`${this.API_URL}/bitcoin/getLatestHighlights`)
             .then((response) => {
-                console.log(response)
-                this.setState({
-                    ethPrice: response.data.eth.price,
-                    btcPrice: response.data.btc.price
-                })
+                let txnCountBtc = response.data.length;
+                let fromTxnNumberBtc = 0;
+                let toTxnNumberBtc = (txnCountBtc > 9) ? 9 : 9 - txnCountBtc;
+                this.setState({ btcTxns: response.data, fromTxnNumberBtc: fromTxnNumberBtc, toTxnNumberBtc: toTxnNumberBtc, txnCountBtc: txnCountBtc })
+                this.prepareBtcTxnsMarkup((response.data).slice(fromTxnNumberBtc, toTxnNumberBtc))
             })
+    }
+
+    getEthTxns() {
+        axios.post(`${this.API_URL}/eth/getLatestHighlights`)
+            .then((response) => {
+                let txnCountEth = response.data.length;
+                let fromTxnNumberEth = 0;
+                let toTxnNumberEth = (txnCountEth > 9) ? 9 : 9 - txnCountEth;
+                this.setState({ ethTxns: response.data, fromTxnNumberEth: fromTxnNumberEth, toTxnNumberEth: toTxnNumberEth, txnCountEth: txnCountEth })
+                this.prepareEthTxnsMarkup((response.data).slice(fromTxnNumberEth, toTxnNumberEth))
+            })
+    }
+
+    prepareBtcTxnsMarkup = (txns) => {
+        let markup = [];
+        txns.forEach((txn) => {
+            markup.push(
+                <tr style={{fontSize: '14px'}}>
+                    <td>{txn.height}</td>
+                    <td>{txn.txnIndex}</td>
+                    <td>{lib.formatDate(txn.time)}</td>
+                    <td>{txn.value}</td>
+                    <td><button onClick={() => this.setState({[`${txn.height}_${txn.txnIndex}`]: true})}>Fetch</button></td>
+                </tr>
+            )
+            markup.push(
+                <tr style={{display: (this.state[`${txn.height}_${txn.txnIndex}`]) ? 'inline': 'none'}}>
+                    hello
+                </tr>
+            )
+        })
+        this.setState({ btcTxnsMarkup: markup })
+    }
+
+    prepareEthTxnsMarkup = (txns) => {
+        let markup = [];
+        txns.forEach((txn) => {
+            markup.push(
+                <tr style={{fontSize: '14px'}}>
+                    <td>{txn.blockNumber}</td>
+                    <td>{txn.transactionIndex}</td>
+                    <td>{lib.formatDate(txn.timestamp)}</td>
+                    <td>{txn.value}</td>
+                    <td><button onClick={() => this.fetchBtcTxnDetails(txn.hash)}>Fetch</button></td>
+                </tr>
+            )
+        })
+        this.setState({ ethTxnsMarkup: markup })
+    }
+
+    fetchBtcTxnDetails = (hash) => {
+        let markup = <div>{hash}
+        </div>
     }
 
     handleSort = (sortField) => {
         console.log(event)
         this.setState({ [sortField]: !this.state[sortField] })
+        if (sortField === 'btcValueDescSort') {
+            let sortedTxns = lodash.orderBy(this.state.btcTxns, ['value'], [(!this.state[sortField]) ? 'asc' : 'desc']);
+            let fromTxnNumberBtc = 0;
+            let toTxnNumberBtc = (sortedTxns.length > 9) ? 9 : 9 - sortedTxns.length;
+            this.setState({ btcTxns: sortedTxns, fromTxnNumberBtc: fromTxnNumberBtc, toTxnNumberBtc: toTxnNumberBtc })
+            this.prepareBtcTxnsMarkup((sortedTxns).slice(fromTxnNumberBtc, toTxnNumberBtc))
+        } else if (sortField === 'btcTimestampDescSort') {
+            let sortedTxns = lodash.orderBy(this.state.btcTxns, ['time'], [(!this.state[sortField]) ? 'asc' : 'desc']);
+            let fromTxnNumberBtc = 0;
+            let toTxnNumberBtc = (sortedTxns.length > 9) ? 9 : 9 - sortedTxns.length;
+            this.setState({ btcTxns: sortedTxns, fromTxnNumberBtc: fromTxnNumberBtc, toTxnNumberBtc: toTxnNumberBtc })
+            this.prepareBtcTxnsMarkup((sortedTxns).slice(fromTxnNumberBtc, toTxnNumberBtc))
+        } else if (sortField === 'ethValueDescSort') {
+            let sortedTxns = lodash.orderBy(this.state.ethTxns, ['value'], [(!this.state[sortField]) ? 'asc' : 'desc']);
+            let fromTxnNumberEth = 0;
+            let toTxnNumberEth = (sortedTxns.length > 9) ? 9 : 9 - sortedTxns.length;
+            this.setState({ ethTxns: sortedTxns, fromTxnNumberEth: fromTxnNumberEth, toTxnNumberEth: toTxnNumberEth })
+            this.prepareEthTxnsMarkup((sortedTxns).slice(fromTxnNumberEth, toTxnNumberEth))
+
+        } else if (sortField === 'ethTimestampDescSort') {
+
+            let sortedTxns = lodash.orderBy(this.state.ethTxns, ['timestamp'], [(!this.state[sortField]) ? 'asc' : 'desc']);
+            let fromTxnNumberEth = 0;
+            let toTxnNumberEth = (sortedTxns.length > 9) ? 9 : 9 - sortedTxns.length;
+            this.setState({ ethTxns: sortedTxns, fromTxnNumberEth: fromTxnNumberEth, toTxnNumberEth: toTxnNumberEth })
+            this.prepareEthTxnsMarkup((sortedTxns).slice(fromTxnNumberEth, toTxnNumberEth))
+        }
     }
 
     handleChange = (event) => {
@@ -316,41 +402,75 @@ export default class MainDashboard extends Component {
         this.getTransactionDetail(JSON.parse(event.target.value).transactionIndex, JSON.parse(event.target.value).blockNumber)
     }
 
-    fetchNext = async () => {
+    fetchNextBtc = async () => {
 
-        let fromTxnNumber = this.state.fromTxnNumber + 10;
-        let toTxnNumber = (fromTxnNumber + 9 > this.state.txnCount) ? this.state.txnCount - 1 : fromTxnNumber + 9;
+        console.log('called')
+        console.log(this.state)
+        let fromTxnNumberBtc = this.state.fromTxnNumberBtc + 10;
+        let toTxnNumberBtc = (fromTxnNumberBtc + 9 > this.state.txnCountBtc) ? this.state.txnCountBtc - 1 : fromTxnNumberBtc + 9;
         let transactions = [];
 
-        for (let txnNumber = fromTxnNumber; txnNumber <= toTxnNumber; txnNumber++) {
-            transactions.push(this.state.txns[txnNumber])
+        for (let txnNumber = fromTxnNumberBtc; txnNumber <= toTxnNumberBtc; txnNumber++) {
+            transactions.push(this.state.btcTxns[txnNumber])
         }
-        this.prepareTableMarkup(transactions);
+        this.prepareBtcTxnsMarkup(transactions);
         this.setState({
-            fromTxnNumber: fromTxnNumber,
-            toTxnNumber: toTxnNumber
+            fromTxnNumberBtc: fromTxnNumberBtc,
+            toTxnNumberBtc: toTxnNumberBtc
         })
     }
 
-    fetchPrev = async () => {
+    fetchPrevBtc = async () => {
 
-        let fromTxnNumber = this.state.fromTxnNumber - 10
-        let toTxnNumber = fromTxnNumber + 9
+        let fromTxnNumberBtc = this.state.fromTxnNumberBtc - 10
+        let toTxnNumberBtc = fromTxnNumberBtc + 9
         let transactions = [];
 
-        for (let txnNumber = fromTxnNumber; txnNumber <= toTxnNumber; txnNumber++) {
-            transactions.push(this.state.txns[txnNumber])
+        for (let txnNumber = fromTxnNumberBtc; txnNumber <= toTxnNumberBtc; txnNumber++) {
+            transactions.push(this.state.btcTxns[txnNumber])
         }
-        this.prepareTableMarkup(transactions);
+        this.prepareBtcTxnsMarkup(transactions);
         this.setState({
-            fromTxnNumber: fromTxnNumber,
-            toTxnNumber: toTxnNumber
+            fromTxnNumberBtc: fromTxnNumberBtc,
+            toTxnNumberBtc: toTxnNumberBtc
+        })
+    }
+
+    fetchNextEth = async () => {
+
+        let fromTxnNumberEth = this.state.fromTxnNumberEth + 10;
+        let toTxnNumberEth = (fromTxnNumberEth + 9 > this.state.txnCountEth) ? this.state.txnCountEth - 1 : fromTxnNumberEth + 9;
+        let transactions = [];
+
+        for (let txnNumber = fromTxnNumberEth; txnNumber <= toTxnNumberEth; txnNumber++) {
+            transactions.push(this.state.ethTxns[txnNumber])
+        }
+        this.prepareEthTxnsMarkup(transactions);
+        this.setState({
+            fromTxnNumberEth: fromTxnNumberEth,
+            toTxnNumberEth: toTxnNumberEth
+        })
+    }
+
+    fetchPrevEth = async () => {
+
+        let fromTxnNumberEth = this.state.fromTxnNumberEth - 10
+        let toTxnNumberEth = fromTxnNumberEth + 9
+        let transactions = [];
+
+        for (let txnNumber = fromTxnNumberEth; txnNumber <= toTxnNumberEth; txnNumber++) {
+            transactions.push(this.state.ethTxns[txnNumber])
+        }
+        this.prepareEthTxnsMarkup(transactions);
+        this.setState({
+            fromTxnNumberEth: fromTxnNumberEth,
+            toTxnNumberEth: toTxnNumberEth
         })
     }
 
     render() {
         return (
-            <div style={{ display: 'flex', marginTop: '20px', fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif' }}>
+            <div style={{ display: 'flex', marginTop: '20px', marginBottom: '20px', fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif' }}>
                 <div style={{ justifyContent: 'center', width: '100%', display: 'inline-grid' }}>
                     <div className="navigator" style={{ width: '1500px', paddingBottom: '16px', height: '30px' }}>
                         <div style={{ float: 'left', paddingLeft: '15px' }}>
@@ -402,7 +522,7 @@ export default class MainDashboard extends Component {
                         </FormGroup>
                         <div style={{ float: 'right', fontSize: '20px' }}>
                             <span style={{ paddingRight: '20px' }}>Bitcoin&nbsp;${this.state.btcPrice}</span>
-                            <span>Ethereum&nbsp;${this.state.ethPrice}</span>
+                            <span style={{ marginRight: '20px' }}>Ethereum&nbsp;${this.state.ethPrice}</span>
                         </div>
                     </div>
                     <table style={{ width: '1500px', marginBottom: '20px' }}>
@@ -437,25 +557,26 @@ export default class MainDashboard extends Component {
                                     Bitcoin
                             </span>
                                 <Tooltip title="Next" style={{ padding: '-10px' }}>
-                                    <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchNext} disabled={(this.state.toTxnNumber + 1) == this.state.txnCount}>
+                                    <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchNextBtc} disabled={(this.state.toTxnNumberBtc + 1) == this.state.txnCountBtc}>
                                         <MdKeyboardArrowRight style={{ fontSize: '40px' }} />
                                     </Button>
                                 </Tooltip>
                                 <Tooltip title="Prev" style={{ padding: '-10px' }}>
-                                    <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchPrev} disabled={(this.state.fromTxnNumber == 0)}>
+                                    <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchPrevBtc} disabled={(this.state.fromTxnNumberBtc == 0)}>
                                         <MdKeyboardArrowLeft style={{ fontSize: '40px' }} />
                                     </Button>
                                 </Tooltip>
                             </div>
                             <table style={{ width: '740px' }}>
-                                <tr>
-                                    <th>Txn Hash</th>
+                                <tr style={{fontSize: '16px'}}>
+                                    <th>Block</th>
+                                    <th>Txn Index</th>
                                     <th>
                                         <span>Date & Time</span>
                                         <span>
                                             {(this.state.btcTimestampDescSort)
-                                                ? <Button onClick={() => this.handleSort('btcTimestampDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountUp /></Button>
-                                                : <Button onClick={() => this.handleSort('btcTimestampDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountDown /> </Button>
+                                                ? <Button onClick={() => this.handleSort('btcTimestampDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountDown /></Button>
+                                                : <Button onClick={() => this.handleSort('btcTimestampDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountUp /> </Button>
                                             }
                                         </span>
                                     </th>
@@ -463,8 +584,8 @@ export default class MainDashboard extends Component {
                                         <span>Value</span>
                                         <span>
                                             {(this.state.btcValueDescSort)
-                                                ? <Button onClick={() => this.handleSort('btcValueDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountUp /></Button>
-                                                : <Button onClick={() => this.handleSort('btcValueDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountDown /> </Button>
+                                                ? <Button onClick={() => this.handleSort('btcValueDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountDown /></Button>
+                                                : <Button onClick={() => this.handleSort('btcValueDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountUp /> </Button>
                                             }
                                         </span>
                                     </th>
@@ -479,25 +600,26 @@ export default class MainDashboard extends Component {
                                     Ethereum
                                 </span>
                                 <Tooltip title="Next" style={{ padding: '-10px' }}>
-                                    <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchNext} disabled={(this.state.toTxnNumber + 1) == this.state.txnCount}>
+                                    <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchNextEth} disabled={(this.state.toTxnNumberEth + 1) == this.state.txnCountEth}>
                                         <MdKeyboardArrowRight style={{ fontSize: '40px' }} />
                                     </Button>
                                 </Tooltip>
                                 <Tooltip title="Prev" style={{ padding: '-10px' }}>
-                                    <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchPrev} disabled={(this.state.fromTxnNumber == 0)}>
+                                    <Button style={{ color: '#ffffff', float: "right", padding: '10px !important' }} onClick={this.fetchPrevEth} disabled={(this.state.fromTxnNumberEth == 0)}>
                                         <MdKeyboardArrowLeft style={{ fontSize: '40px' }} />
                                     </Button>
                                 </Tooltip>
                             </div>
                             <table style={{ width: '740px' }}>
-                                <tr>
-                                    <th>Txn Hash</th>
+                                <tr style={{fontSize: '16px'}}>
+                                    <th>Block</th>
+                                    <th>Txn index</th>
                                     <th>
                                         <span>Date & Time</span>
                                         <span>
                                             {(this.state.ethTimestampDescSort)
-                                                ? <Button onClick={() => this.handleSort('ethTimestampDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountUp /></Button>
-                                                : <Button onClick={() => this.handleSort('ethTimestampDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountDown /> </Button>
+                                                ? <Button onClick={() => this.handleSort('ethTimestampDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountDown /></Button>
+                                                : <Button onClick={() => this.handleSort('ethTimestampDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountUp /> </Button>
                                             }
                                         </span>
                                     </th>
@@ -505,8 +627,8 @@ export default class MainDashboard extends Component {
                                         <span>Value</span>
                                         <span>
                                             {(this.state.ethValueDescSort)
-                                                ? <Button onClick={() => this.handleSort('ethValueDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountUp /></Button>
-                                                : <Button onClick={() => this.handleSort('ethValueDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountDown /> </Button>
+                                                ? <Button onClick={() => this.handleSort('ethValueDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountDown /></Button>
+                                                : <Button onClick={() => this.handleSort('ethValueDescSort')} style={{ color: '#ffffff', fontSize: '16px' }}><FaSortAmountUp /> </Button>
                                             }
                                         </span>
                                     </th>
