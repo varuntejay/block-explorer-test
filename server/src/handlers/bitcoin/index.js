@@ -50,16 +50,18 @@ router.post('/getTxnDetails', async (req, res) => {
 })
 
 
-// router.post("/deleteDocument", async (req, res) => {
+router.post("/deleteDocument", async (req, res) => {
 
-//     const db = dbConnection.db('bitcoin_db');
+    const db = dbConnection.db('bitcoin_db');
+
+    // 493300
     
-//     db.collection('blocks').deleteMany({ "height": {"$eq" : 438002}}, (err, result) => {
-//         console.error(err)
-//         console.log(result);
-//         res.send({staus: true, result: result})
-//     })
-// })
+    db.collection('transactions').deleteMany({ "height": {"$gte" : 493300}}, (err, result) => {
+        console.error(err)
+        console.log(result);
+        res.send({staus: true, result: result})
+    })
+})
 
 
 
