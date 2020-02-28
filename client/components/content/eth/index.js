@@ -113,7 +113,7 @@ export default class Content extends Component {
         }
         axios.post(`${this.API_URL}/eth/getTxnDetails`, params)
             .then((response) => {
-                console.log(response)
+                // console.log(response)
                 let txn = response.data.txn;
                 let markup =
                     <table className="transactionDetails">
@@ -165,7 +165,7 @@ export default class Content extends Component {
     }
 
     getTransactions = (event) => {
-        console.log(event.target.value);
+        // console.log(event.target.value);
         let blockNumber = event.target.value;
         let transactions = [];
         let txnCount = this.state.blocksMapTable[blockNumber].transactions.length;
@@ -207,7 +207,7 @@ export default class Content extends Component {
             try {
                 axios.post(`${this.API_URL}/getBlocks/height`)
                     .then((response) => {
-                        console.log(response)
+                        // console.log(response)
                         if (response.data.status) {
                             resolve(response.data.blocksHeight);
                         } else {
@@ -230,7 +230,7 @@ export default class Content extends Component {
             axios.post(`${this.API_URL}/eth/getBlocksWithPagination`, params)
                 .then((response) => {
 
-                    console.log(response)
+                    // console.log(response)
                     if (response.data.status) {
                         let blocks = response.data.blocks;
 
@@ -324,11 +324,11 @@ export default class Content extends Component {
     }
 
     render() {
-        console.log((this.state.latestBlockOffset + this.state.size >= this.state.blocksHeight))
-        console.log((this.state.latestBlockOffset == 0))
-        console.log(this.state.txnCount)
-        console.log(this.state.fromTxnNumber)
-        console.log(this.state.toTxnNumber)
+        // console.log((this.state.latestBlockOffset + this.state.size >= this.state.blocksHeight))
+        // console.log((this.state.latestBlockOffset == 0))
+        // console.log(this.state.txnCount)
+        // console.log(this.state.fromTxnNumber)
+        // console.log(this.state.toTxnNumber)
         return (
             <div style={{ display: 'flex', marginTop: '20px', fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif' }}>
                 <div style={{ justifyContent: 'center', width: '100%', display: (this.state.viewBlockMarkup) ? 'inline-grid' : 'none' }}>

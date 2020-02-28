@@ -76,6 +76,7 @@ module.exports.getLatestHighlights = async (endTime, hours) => {
 
     // }
 
+    console.log(endTime)
     let query = {timestamp: { $gte: startTime}};
 
     console.log(JSON.stringify(query))
@@ -95,6 +96,11 @@ module.exports.getLatestHighlights = async (endTime, hours) => {
             "transactionIndex": 1
         }
     }
-    let filteredTransactions = await dbConnection.db("eth_db").collection("transactions").find({"blockNumber": {$gt: filteredBlocks[0].number}}, projections).sort({ "value": -1 }).limit(100).toArray();
-    return filteredTransactions
+    try {
+        let filteredTransactions = await dbConnection.db("eth_db").collection("transactions").find({"blockNumber": {$gt: filteredBlocks[0].number}}, projections).sort({ "value": -1 }).limit(100).toArray();
+        console.log(filteredTransactions)
+        return filteredTransactions
+    } catch (error) {
+        console.error(error);
+    }
 }

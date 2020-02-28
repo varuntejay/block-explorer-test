@@ -165,11 +165,11 @@ export default class Dashboard extends Component {
             blockNumber: blockNumber,
             transactionIndex: transactionIndex
         }
-        console.log(params)
+        // console.log(params)
         if (this.state.coinType === 'eth') {
             axios.post(`${this.API_URL}/eth/getTxnDetails`, params)
                 .then((response) => {
-                    console.log(response)
+                    // console.log(response)
                     let txn = response.data.txn;
                     let markup =
                         <table className="transactionDetails" style={{ width: '600px', marginLeft: '15px' }}>
@@ -212,7 +212,7 @@ export default class Dashboard extends Component {
         } else {
             axios.post(`${this.API_URL}/bitcoin/getTxnDetails`, params)
                 .then((response) => {
-                    console.log(response)
+                    // console.log(response)
                     let txn = response.data.txn;
                     let markup =
                         <table className="transactionDetails">
@@ -244,7 +244,7 @@ export default class Dashboard extends Component {
     }
 
     fetchTransactionDetails = (event) => {
-        console.log(event.target.value)
+        // console.log(event.target.value)
         this.getTransactionDetail(JSON.parse(event.target.value).transactionIndex, JSON.parse(event.target.value).blockNumber)
     }
 
