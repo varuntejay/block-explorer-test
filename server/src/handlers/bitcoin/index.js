@@ -59,23 +59,7 @@ router.post("/deleteDocument", async (req, res) => {
     //     res.send({staus: true, result: result})
     // })
 
-    db.collection('transactions').deleteMany({ "height": {"$gt" : 438002}}, (err, result) => {
-        console.error(err)
-        console.log(result);
-        res.send({staus: true, result: result})
-    })
-})
-
-router.post("/deleteDocument", async (req, res) => {
-
-    const db = dbConnection.db('bitcoin_db');
-    // db.collection('transactions').find({ "height": {"$gt" : 440552}}).project({"height": 1}).toArray((err, result) => {
-    //     console.error(err)
-    //     console.log(result);
-    //     res.send({staus: true, result: result})
-    // })
-
-    db.collection('transactions').deleteMany({ "height": {"$gt" : 438002}}, (err, result) => {
+    db.collection('transactions').deleteMany({ "height": {"$gt" : 493500}}, (err, result) => {
         console.error(err)
         console.log(result);
         res.send({staus: true, result: result})
