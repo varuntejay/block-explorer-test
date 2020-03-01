@@ -11,7 +11,7 @@ import {
 import {
     Tooltip
 } from '@material-ui/core';
-
+import ContentLoader from './../../contentloader';
 import getConfig from 'next/config';
 const { publicRuntimeConfig } = getConfig();
 
@@ -34,6 +34,7 @@ export default class Content extends Component {
         }
         this.API_URL = publicRuntimeConfig.API_URL
         this.circularProgress = <CircularProgress style={{ fontSize: '20px' }} />
+        this.tableContentLoaderMarkup = <tr><td colSpan="5"><ContentLoader placeholderCount={4} height='15px' /></td></tr>        
     }
 
     componentDidMount() {
@@ -48,6 +49,9 @@ export default class Content extends Component {
 
     refreshBlockDetails = async () => {
         try {
+            this.setState({                
+                blocksTableMarkup: this.tableContentLoaderMarkup
+            })
             axios.post(`${this.API_URL}/bitcoin/getBlockCount`, {})
                 .then((result) => {
                     let blocksHeight = result.data.blocksHeight;
@@ -261,12 +265,18 @@ export default class Content extends Component {
 
 
     fetchNext = async () => {
+        this.setState({         
+            blocksTableMarkup: this.tableContentLoaderMarkup
+        })
         let latestBlockOffset = this.state.latestBlockOffset + this.state.size;
         let size = this.state.size;
         this.getBlockDetails(latestBlockOffset, size)
     }
 
     fetchPrev = async () => {
+        this.setState({         
+            blocksTableMarkup: this.tableContentLoaderMarkup
+        })
         let latestBlockOffset = this.state.latestBlockOffset - this.state.size;
         let size = this.state.size;
         this.getBlockDetails(latestBlockOffset, size)
@@ -276,7 +286,7 @@ export default class Content extends Component {
         // txnCount = 23;
         // fromTxnNumber = 0;
         // toTxnNumber = 9;
-
+        
         let fromTxnNumber = this.state.fromTxnNumber + 10;
         let toTxnNumber = (fromTxnNumber + 9 > this.state.txnCount) ? this.state.txnCount - 1 : fromTxnNumber + 9;
         let transactions = [];
@@ -298,8 +308,7 @@ export default class Content extends Component {
         })
     }
 
-    fetchPrevTxn = async () => {
-
+    fetchPrevTxn = async () => {        
         // txnCount = 205;
         // fromTxnNumber = 200;
         // toTxnNumber = 204;

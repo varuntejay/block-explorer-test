@@ -13,6 +13,7 @@ import {
 } from '@material-ui/core';
 
 import getConfig from 'next/config';
+import ContentLoader from './../../contentloader';
 const { publicRuntimeConfig } = getConfig();
 
 export default class Content extends Component {
@@ -32,6 +33,7 @@ export default class Content extends Component {
             row: ""
         }
         this.API_URL = publicRuntimeConfig.API_URL
+        this.tableContentLoaderMarkup = <tr><td colSpan="5"><ContentLoader placeholderCount={4} height='15px' /></td></tr>        
         this.circularProgress = <CircularProgress style={{ fontSize: '20px' }} />
     }
 
@@ -46,6 +48,9 @@ export default class Content extends Component {
 
     refreshBlockDetails = async () => {
         try {
+            this.setState({                
+                blocksTableMarkup: this.tableContentLoaderMarkup
+            })
             axios.post(`${this.API_URL}/eth/getBlockCount`, {})
                 .then((result) => {
                     let blocksHeight = result.data.blocksHeight;
@@ -260,12 +265,18 @@ export default class Content extends Component {
     }
 
     fetchNext = async () => {
+        this.setState({                
+            blocksTableMarkup: this.tableContentLoaderMarkup
+        })
         let latestBlockOffset = this.state.latestBlockOffset + this.state.size;
         let size = this.state.size;
         this.getBlockDetails(latestBlockOffset, size)
     }
 
     fetchPrev = async () => {
+        this.setState({                
+            blocksTableMarkup: this.tableContentLoaderMarkup
+        })
         let latestBlockOffset = this.state.latestBlockOffset - this.state.size;
         let size = this.state.size;
         this.getBlockDetails(latestBlockOffset, size)

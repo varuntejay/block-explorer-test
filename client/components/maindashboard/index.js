@@ -25,6 +25,7 @@ import {
 } from "react-icons/fa"
 import lodash from 'lodash'
 import lib from './../../lib/index'
+import ContentLoader from './../contentloader';
 
 
 import getConfig from 'next/config';
@@ -50,15 +51,14 @@ export default class MainDashboard extends Component {
         this.API_URL = publicRuntimeConfig.API_URL
         this.circularProgress = <CircularProgress style={{ fontSize: '20px' }} />
         this.noDataMarkup = <div style={{ marginTop: '15px', textAlign: 'center', fontSize: '30px', color: '#ffffff' }}>No transactions found</div>
+        this.tableContentLoaderMarkup = <tr><td colSpan="5"><ContentLoader placeholderCount={4} height='15px' /></td></tr>
+        this.cellContentLoaderMarkup = <ContentLoader placeholderCount={1} height='10px' marginLeft='30%' />
     }
 
-    componentDidMount() {
+    componentDidMount() {            
         this.getStats('daily')
-        this.getBtcTxns()
-        this.getEthTxns()
         axios.post(`${this.API_URL}/price/get`)
             .then((response) => {
-                // console.log(response)
                 this.setState({
                     ethPrice: response.data.eth.price,
                     btcPrice: response.data.btc.price
@@ -66,8 +66,24 @@ export default class MainDashboard extends Component {
             })
     }
 
-    getBtcTxns() {
-        axios.post(`${this.API_URL}/bitcoin/getLatestHighlights`)
+    setContentLoader() {
+        this.setState({
+            btcTxnsMarkup: this.tableContentLoaderMarkup,
+            ethTxnsMarkup: this.tableContentLoaderMarkup,
+            ethTotalTxns: this.cellContentLoaderMarkup,
+            ethAvgTxns: this.cellContentLoaderMarkup,
+            ethAvgBlocks: this.cellContentLoaderMarkup,
+            bitcoinTotalTxns: this.cellContentLoaderMarkup,
+            bitcoinAvgTxns: this.cellContentLoaderMarkup,
+            bitcoinAvgBlocks: this.cellContentLoaderMarkup
+        })
+    }
+
+    getBtcTxns(timeUnit) {
+        let params = {
+            "timeUnit": timeUnit
+        }
+        axios.post(`${this.API_URL}/bitcoin/getLatestHighlights`, params)
             .then((response) => {
                 let txnCountBtc = response.data.length;
                 let fromTxnNumberBtc = 0;
@@ -77,8 +93,11 @@ export default class MainDashboard extends Component {
             })
     }
 
-    getEthTxns() {
-        axios.post(`${this.API_URL}/eth/getLatestHighlights`)
+    getEthTxns(timeUnit) {
+        let params = {
+            "timeUnit": timeUnit
+        }
+        axios.post(`${this.API_URL}/eth/getLatestHighlights`, params)
             .then((response) => {
                 // console.log(response)
                 let txnCountEth = response.data.length;
@@ -180,9 +199,9 @@ export default class MainDashboard extends Component {
                 // console.log(response)
                 let txn = response.data.txn;
                 let markup =
-                    <table className="transactionDetails" style={{width: '740px'}}>
+                    <table className="transactionDetails" style={{ width: '740px' }}>
                         <tbody>
-                            <tr style={{fontSize: '16px'}}>
+                            <tr style={{ fontSize: '16px' }}>
                                 <td>Txn Hash</td>
                                 <td>{txn.hash}</td>
                             </tr>
@@ -274,6 +293,7 @@ export default class MainDashboard extends Component {
     }
 
     getStats = (period) => {
+        this.setContentLoader();
         let timeUnit = 1;
         if (period === 'weekly') timeUnit = 7;
         if (period === 'monthly') timeUnit = 20;
@@ -300,6 +320,8 @@ export default class MainDashboard extends Component {
                     bitcoinAvgBlocks: data.avgNoOfBlocks
                 })
             })
+        this.getBtcTxns(timeUnit)
+        this.getEthTxns(timeUnit)
     }
 
     viewDetails = () => {
@@ -752,7 +774,7 @@ export default class MainDashboard extends Component {
                                     </tr>
                                     {this.state.ethTxnsMarkup}
                                 </table>
-                                : this.state.ethTxnDetailsMarkup 
+                                : this.state.ethTxnDetailsMarkup
                             }
                         </div>
                     </div>

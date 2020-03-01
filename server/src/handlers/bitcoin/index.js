@@ -104,9 +104,10 @@ router.post("/getStats", async (req, res) => {
 router.post("/getLatestHighlights", async (req, res) => {
     console.log('called')
     const db = dbConnection.db('bitcoin_db');
+    let timeUnit = parseInt(req.body.timeUnit)
     let latestBlockTimestamp = await db.collection('blocks').find({}).project({"_id": -1, "time": 1}).sort({ "height": -1 }).limit(1).toArray()
     console.log(latestBlockTimestamp)
-    let result = await getLatestHighlights(latestBlockTimestamp[0].time, 24)
+    let result = await getLatestHighlights(latestBlockTimestamp[0].time, 24*timeUnit)
     console.log('called end')
     res.status(200).send(result)
 });

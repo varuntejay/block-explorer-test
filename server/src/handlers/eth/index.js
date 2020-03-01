@@ -114,9 +114,9 @@ router.post("/getStats", async (req, res) => {
 router.post("/getLatestHighlights", async (req, res) => {
     console.log(req.body);
     const db = dbConnection.db('eth_db');
+    let timeUnit = parseInt(req.body.timeUnit)
     let blockDetails = await db.collection('blocks').find({}).project({"timestamp": 1, "number": 1}).sort({ "number": -1 }).limit(1).toArray()
-    let result = await getLatestHighlights(blockDetails[0].timestamp, 24)
-    console.log('*************************: ', result)
+    let result = await getLatestHighlights(blockDetails[0].timestamp, 24*timeUnit)    
     res.status(200).send(result)
 });
 

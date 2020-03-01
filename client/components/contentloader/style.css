@@ -1,0 +1,16 @@
+.placeholder-content {
+    top: 20px;
+    left: 0;
+    animation-duration: 1.5s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-name: placeholderAnimate;    
+    background: linear-gradient(to right, #ffffff21 2%, #24292e 18%, #ffffff21 33%);
+    background-size: 1300px;
+}
+
+@keyframes placeholderAnimate{
+    0%{ background-position: -650px 0;}
+    100%{ background-position: 650px 0;}
+}
