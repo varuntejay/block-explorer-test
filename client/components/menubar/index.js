@@ -23,6 +23,11 @@ export default class MenuBar extends Component {
                 "url": "/dashboard"
             },
             {
+                "id": "advancedsearch",
+                "label": "Advanced search",
+                "url": "/advancedsearch"
+            },
+            {
                 "id": "bitcoin",
                 "label": "Bitcoin",
                 "url": "/bitcoin"

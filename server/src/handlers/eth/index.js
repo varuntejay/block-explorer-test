@@ -1,6 +1,6 @@
 const express = require('express');
 const { getConnection } = require('../../lib/mongo')
-const { getFilteredTransactions, getStats } = require('./../filterTransactions/transactionFilter')
+const { getFilteredTransactions, getStats, getLatestHighlights } = require('./../filterTransactions/transactionFilter')
 const router = express.Router();
 let dbConnection;
 getConnection()
@@ -109,6 +109,15 @@ router.post("/getStats", async (req, res) => {
     let stats = await getStats(parseInt(req.body.timeUnit))
     console.log(stats)
     res.status(200).send(stats)
+});
+
+router.post("/getLatestHighlights", async (req, res) => {
+    console.log(req.body);
+    const db = dbConnection.db('eth_db');
+    let blockDetails = await db.collection('blocks').find({}).project({"timestamp": 1, "number": 1}).sort({ "number": -1 }).limit(1).toArray()
+    let result = await getLatestHighlights(blockDetails[0].timestamp, 24)
+    console.log('*************************: ', result)
+    res.status(200).send(result)
 });
 
 module.exports = router;

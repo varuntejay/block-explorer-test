@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import '../style.css'
 import axios from 'axios';
 import lib from './../../../lib/index';
-import { Button, CircularProgress } from '@material-ui/core';
+import { Button, CircularProgress, Select, MenuItem } from '@material-ui/core';
 import {
     MdKeyboardArrowLeft,
     MdKeyboardArrowRight,
@@ -29,7 +29,8 @@ export default class Content extends Component {
             transactionsTableMarkup: "",
             fromTxnNumber: 0,
             toTxnNumber: 0,
-            row: ""
+            row: "",
+            mainPageRows: 20
         }
         this.API_URL = publicRuntimeConfig.API_URL
         this.circularProgress = <CircularProgress style={{ fontSize: '20px' }} />
@@ -37,8 +38,13 @@ export default class Content extends Component {
 
     componentDidMount() {
         this.refreshBlockDetails();
-        console.log(publicRuntimeConfig)
     }
+
+    handleChange = (event) => {
+        this.setState({ [event.target.name]: event.target.value })
+        this.refreshBlockDetails();
+    }
+
 
     refreshBlockDetails = async () => {
         try {
@@ -84,7 +90,7 @@ export default class Content extends Component {
     prepareTransactionsTableMarkup = (transactionDetails, blockNumber) => {
         let markup = []
         transactionDetails.forEach((txn, index) => {
-            if ( index == 0) {
+            if (index == 0) {
                 this.getTransactionDetail(0, blockNumber)
             }
             markup.push(
@@ -109,13 +115,13 @@ export default class Content extends Component {
         }
         axios.post(`${this.API_URL}/bitcoin/getTxnDetails`, params)
             .then((response) => {
-                console.log(response)
+                // console.log(response)
                 let txn = response.data.txn;
                 let totalOutput = 0;
                 (txn.vout).forEach((out) => {
                     totalOutput += parseFloat(out.value)
                 })
-                console.log(totalOutput)
+                // console.log(totalOutput)
                 let markup =
                     <table className="transactionDetails">
                         <tbody>
@@ -138,12 +144,12 @@ export default class Content extends Component {
                             <tr>
                                 <td>Total output (BTC)</td>
                                 <td>{totalOutput}</td>
-                            </tr>                            
+                            </tr>
                             <tr>
                                 <td>Hash</td>
                                 <td>{txn.hash}</td>
                             </tr>
-                            
+
                         </tbody>
                     </table >
                 this.setState({ trasactionDetailsMarkup: markup })
@@ -159,7 +165,7 @@ export default class Content extends Component {
     }
 
     getTransactions = (event) => {
-        console.log(event.target.value);
+        // console.log(event.target.value);
         let blockNumber = event.target.value;
         let transactions = [];
         let txnCount = this.state.blocksMapTable[blockNumber].tx.length;
@@ -201,7 +207,7 @@ export default class Content extends Component {
             try {
                 axios.post(`${this.API_URL}/getBlocks/height`)
                     .then((response) => {
-                        console.log(response)
+                        // console.log(response)
                         if (response.data.status) {
                             resolve(response.data.blocksHeight);
                         } else {
@@ -224,7 +230,7 @@ export default class Content extends Component {
             axios.post(`${this.API_URL}/bitcoin/getBlocksWithPagination`, params)
                 .then((response) => {
 
-                    console.log(response)
+                    // console.log(response)
                     if (response.data.status) {
                         let blocks = response.data.blocks;
 
@@ -319,11 +325,11 @@ export default class Content extends Component {
     }
 
     render() {
-        console.log((this.state.latestBlockOffset + this.state.size >= this.state.blocksHeight))
-        console.log((this.state.latestBlockOffset == 0))
-        console.log(this.state.txnCount)
-        console.log(this.state.fromTxnNumber)
-        console.log(this.state.toTxnNumber)
+        // console.log((this.state.latestBlockOffset + this.state.size >= this.state.blocksHeight))
+        // console.log((this.state.latestBlockOffset == 0))
+        // console.log(this.state.txnCount)
+        // console.log(this.state.fromTxnNumber)
+        // console.log(this.state.toTxnNumber)
         return (
             <div style={{ display: 'flex', marginTop: '20px', fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif' }}>
                 <div style={{ justifyContent: 'center', width: '100%', display: (this.state.viewBlockMarkup) ? 'inline-grid' : 'none' }}>
@@ -341,6 +347,24 @@ export default class Content extends Component {
                                     <MdRefresh style={{ fontSize: '30px' }} />
                                 </Button>
                             </Tooltip>
+
+                            <div style={{ borderLeft: '0.5pt solid black' }}></div>
+
+                            <div style={{marginTop: '12px'}}>
+                                <span style={{ fontSize: '20px', color:'#ffffff', marginRight: '10px'}}>Rows per page</span>
+                                <Select
+                                    value={this.state.size}
+                                    name="size"
+                                    onChange={this.handleChange}
+                                    style={{color: '#000000', backgroundColor: '#ffffff', paddingLeft: '10px'}}
+                                >
+                                    <MenuItem value={10}>10</MenuItem>
+                                    <MenuItem value={20}>20</MenuItem>
+                                    <MenuItem value={30}>30</MenuItem>
+                                    <MenuItem value={40}>40</MenuItem>
+                                </Select>
+                            </div>
+                            
                             <div style={{ borderLeft: '0.5pt solid black' }}></div>
 
 
@@ -373,7 +397,7 @@ export default class Content extends Component {
                 </div>
                 <div style={{ justifyContent: 'center', width: '100%', display: (this.state.viewTransactionMarkup) ? 'flex' : 'none' }}>
                     <div style={{ width: '800px', marginRight: '15px' }}>
-                        <div className="navigator" style={{marginBottom: '0px'}}>
+                        <div className="navigator" style={{ marginBottom: '0px' }}>
                             <div style={{ float: 'left', paddingLeft: '15px' }}>
                                 <button type="button" style={{ padding: '5px', marginRight: '20px' }} onClick={() => { this.setState({ viewBlockMarkup: true, viewTransactionMarkup: false }) }}>Back</button>
                                 {/* <div style={{ borderLeft: '0.5pt solid black' }}></div> */}
@@ -428,4 +452,4 @@ export default class Content extends Component {
             </div>
         )
     }
-}
+}   

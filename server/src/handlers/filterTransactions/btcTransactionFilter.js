@@ -39,17 +39,43 @@ module.exports.getStats = async (timeUnit) => {
     let latestBlockDetails = await dbConnection.db("bitcoin_db").collection('blocks').find().project({ "height": 1, "time": 1 }).sort({ "height": -1 }).limit(1).toArray()
     let transactionStats = await dbConnection.db("bitcoin_db").collection('transactions').stats()
 
-    let timestamp = moment.unix(latestBlockDetails[0]["time"]).subtract( timeUnit -1, 'days').startOf('day').unix();
-    let count = await dbConnection.db("bitcoin_db").collection('transactions').count({time: {"$gte" : timestamp}})
-    
+    let timestamp = moment.unix(latestBlockDetails[0]["time"]).subtract(timeUnit - 1, 'days').startOf('day').unix();
+    let count = await dbConnection.db("bitcoin_db").collection('transactions').count({ time: { "$gte": timestamp } })
+
     let totalTransactionCount = transactionStats.count
     let daysSinceFirstBlock = moment.unix(latestBlockDetails[0]["time"]).diff(moment.unix(BTC_FIRST_BLOCK_DATE), "days")
 
-   let result = {
+    let result = {
         avgNoOfBlocks: parseInt(latestBlockDetails[0]["height"] * timeUnit / daysSinceFirstBlock),
         avgNoTransactions: parseInt(totalTransactionCount * timeUnit / daysSinceFirstBlock),
         totalNumberOfTransactions: count
     }
     console.log(result)
     return result
+}
+
+module.exports.getLatestHighlights = async (endTime, hours) => {
+    endTime = parseInt(endTime)
+    hours = parseInt(hours || 24)
+    startTime = endTime - hours * 60 * 60;
+    let projections = {
+        "projection": {
+            "_id": 0,
+            "value": 1,
+            "height": 1,
+            "txnIndex": 1,
+            "hash": 1,
+            "time": 1
+        }
+    }
+    console.log(projections)
+    let query = {
+
+        $and: [{ time: { $gt: startTime } }, { time: { $lt: endTime } }]
+
+    }
+    console.log(JSON.stringify(query))
+    let filteredTransactions = await dbConnection.db("bitcoin_db").collection("transactions").find(query, projections).sort({ "value": -1 }).limit(100).toArray()
+    console.log(filteredTransactions.length)
+    return filteredTransactions
 }

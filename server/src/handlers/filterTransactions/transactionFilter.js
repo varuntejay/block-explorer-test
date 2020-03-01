@@ -45,13 +45,13 @@ module.exports.getFilteredTransactions = async (filterParams) => {
 module.exports.getStats = async (timeUnit) => {
     let latestBlockDetails = await dbConnection.db("eth_db").collection('blocks').find().project({ "number": 1, "timestamp": 1 }).sort({ "number": -1 }).limit(1).toArray()
     let transactionStats = await dbConnection.db("eth_db").collection('transactions').stats()
-    
 
-    let timestamp = moment.unix(latestBlockDetails[0]["timestamp"]).subtract( timeUnit -1, 'days').startOf('day').unix();
+
+    let timestamp = moment.unix(latestBlockDetails[0]["timestamp"]).subtract(timeUnit - 1, 'days').startOf('day').unix();
     // console.log(timestamp)
-    let blockNumber = await dbConnection.db("eth_db").collection('blocks').find({"timestamp": {"$gt" : timestamp}}).project({"number": 1}).sort({"number": 1}).limit(1).toArray()
+    let blockNumber = await dbConnection.db("eth_db").collection('blocks').find({ "timestamp": { "$gt": timestamp } }).project({ "number": 1 }).sort({ "number": 1 }).limit(1).toArray()
     // console.log(blockNumber[0].number)
-    let count = await dbConnection.db("eth_db").collection('transactions').count({"blockNumber": {"$gte" : blockNumber[0].number}})
+    let count = await dbConnection.db("eth_db").collection('transactions').count({ "blockNumber": { "$gte": blockNumber[0].number } })
     let transactionCount = transactionStats.count
     // console.log(latestBlockDetails)
     let daysSinceFirstBlock = moment.unix(latestBlockDetails[0]["timestamp"]).diff(moment.unix(ETH_FIRST_BLOCK_DATE), "days")
@@ -63,4 +63,44 @@ module.exports.getStats = async (timeUnit) => {
     }
     // console.log(result)
     return result
+}
+
+
+module.exports.getLatestHighlights = async (endTime, hours) => {
+    endTime = parseInt(endTime || moment().unix())
+    hours = parseInt(hours || 24)
+    let startTime = endTime - hours * 60 * 60;
+    // let query = {
+
+    //     $and: [{ timestamp: { $gt: startTime } }, { timestamp: { $lt: endTime } }]
+
+    // }
+
+    console.log(endTime)
+    let query = {timestamp: { $gte: startTime}};
+
+    console.log(JSON.stringify(query))
+    let filteredBlocks = await dbConnection.db("eth_db").collection("blocks").find(query, { projection: { "_id": 0, "number": 1 } }).sort({"number": 1}).limit(1).toArray()
+    // console.log(filteredBlocks.length)
+    // let minBlock = filteredBlocks[filteredBlocks.length - 1].number
+    // let maxBlock = filteredBlocks[0].number;
+    // query = {
+    //     $and: [{ blockNumber: { $gt: minBlock } }, { blockNumber: { $lt: maxBlock } }]
+    // }
+    let projections = {
+        "projection": {
+            "hash": 1,
+            "value": 1,
+            "blockNumber": 1,
+            "timestamp": 1,
+            "transactionIndex": 1
+        }
+    }
+    try {
+        let filteredTransactions = await dbConnection.db("eth_db").collection("transactions").find({"blockNumber": {$gt: filteredBlocks[0].number}}, projections).sort({ "value": -1 }).limit(100).toArray();
+        console.log(filteredTransactions)
+        return filteredTransactions
+    } catch (error) {
+        console.error(error);
+    }
 }

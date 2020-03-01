@@ -1,6 +1,6 @@
 const express = require('express');
 const { getConnection } = require('../../lib/mongo')
-const { getFilteredTransactions, getStats } = require('./../filterTransactions/btcTransactionFilter')
+const { getFilteredTransactions, getStats, getLatestHighlights } = require('./../filterTransactions/btcTransactionFilter')
 const router = express.Router();
 let dbConnection;
 getConnection()
@@ -53,18 +53,17 @@ router.post('/getTxnDetails', async (req, res) => {
 router.post("/deleteDocument", async (req, res) => {
 
     const db = dbConnection.db('bitcoin_db');
-    // db.collection('transactions').find({ "height": {"$gt" : 440552}}).project({"height": 1}).toArray((err, result) => {
-    //     console.error(err)
-    //     console.log(result);
-    //     res.send({staus: true, result: result})
-    // })
 
-    db.collection('transactions').deleteMany({ "height": {"$gt" : 493500}}, (err, result) => {
+    // 493300
+    
+    db.collection('transactions').deleteMany({ "height": {"$gte" : 493300}}, (err, result) => {
         console.error(err)
         console.log(result);
         res.send({staus: true, result: result})
     })
 })
+
+
 
 router.post("/getBlockCount", async (req, res) => {
 
@@ -102,4 +101,13 @@ router.post("/getStats", async (req, res) => {
     res.status(200).send(stats)
 });
 
+router.post("/getLatestHighlights", async (req, res) => {
+    console.log('called')
+    const db = dbConnection.db('bitcoin_db');
+    let latestBlockTimestamp = await db.collection('blocks').find({}).project({"_id": -1, "time": 1}).sort({ "height": -1 }).limit(1).toArray()
+    console.log(latestBlockTimestamp)
+    let result = await getLatestHighlights(latestBlockTimestamp[0].time, 24)
+    console.log('called end')
+    res.status(200).send(result)
+});
 module.exports = router;
