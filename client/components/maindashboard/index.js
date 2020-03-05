@@ -595,7 +595,7 @@ export default class MainDashboard extends Component {
                 <div style={{ justifyContent: 'center', width: '100%', display: 'inline-grid' }}>
                     <div className="navigator" style={{ width: '1500px', paddingBottom: '16px', height: '30px' }}>
                         <div style={{ float: 'left', paddingLeft: '15px' }}>
-                            <span style={{ fontSize: '30px' }}>Dashboard</span>
+                            <span style={{ fontSize: '30px' }}>Transactions Summary</span>
                         </div>
                     </div>
 
@@ -671,10 +671,15 @@ export default class MainDashboard extends Component {
                             </tr>
                         </tbody>
                     </table>
+                    <div className="navigator" style={{ width: '1500px', paddingBottom: '16px', height: '30px', marginBottom: '20px' }}>
+                        <div style={{ float: 'left', paddingLeft: '15px' }}>
+                            <span style={{ fontSize: '30px' }}>Top Transactions</span>
+                        </div>
+                    </div>
                     <div style={{ display: 'flex' }}>
                         <div>
 
-                            <div style={{ backgroundColor: "#343d4682", marginTop: '20px', marginBottom: '10px', width: '740px', display: 'flow-root', marginRight: '20px' }}>
+                            <div style={{ backgroundColor: "#343d4682", marginTop: '0px', marginBottom: '10px', width: '740px', display: 'flow-root', marginRight: '20px' }}>
                                 <span style={{ float: 'left', color: '#ffffff', fontSize: '20px', padding: '15px' }}>
                                     Bitcoin
                             </span>
@@ -725,7 +730,7 @@ export default class MainDashboard extends Component {
                             }
                         </div>
                         <div>
-                            <div style={{ backgroundColor: "#343d4682", marginTop: '20px', marginBottom: '10px', width: '740px', display: 'flow-root' }}>
+                            <div style={{ backgroundColor: "#343d4682", marginTop: '0px', marginBottom: '10px', width: '740px', display: 'flow-root' }}>
                                 <span style={{ float: 'left', color: '#ffffff', fontSize: '20px', padding: '15px' }}>
                                     Ethereum
                                 </span>

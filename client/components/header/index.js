@@ -8,7 +8,7 @@ export default class Header extends Component {
     render() {
         return(
             <div id="header">                
-                <div id="titleHolder">Block Explorer</div>
+                <div id="titleHolder">Cryptocurrency Dashboard</div>
             </div>
         )
     }
