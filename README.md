@@ -70,4 +70,7 @@ npm run start
 http://<ip>:3000
 ```
 
+## Dashboard
+<img src="images/dashboard.jpeg" width="100%" height="100%"/>
+
 

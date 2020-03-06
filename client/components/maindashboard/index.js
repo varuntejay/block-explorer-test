@@ -55,7 +55,7 @@ export default class MainDashboard extends Component {
         this.cellContentLoaderMarkup = <ContentLoader placeholderCount={1} height='10px' marginLeft='30%' />
     }
 
-    componentDidMount() {            
+    componentDidMount() {
         this.getStats('daily')
         axios.post(`${this.API_URL}/price/get`)
             .then((response) => {
@@ -593,57 +593,58 @@ export default class MainDashboard extends Component {
         return (
             <div style={{ display: 'flex', marginTop: '20px', marginBottom: '20px', fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif' }}>
                 <div style={{ justifyContent: 'center', width: '100%', display: 'inline-grid' }}>
+                    <div style={{ display: 'flex', color: '#ffffff', marginLeft: '650px' }}>
+                        <div>
+                            <FormGroup style={{ display: 'inline', color: '#ffffff', marginRight: '30px' }}>
+                                <FormControlLabel
+                                    label="Daily"
+                                    labelPlacement="start"
+                                    control={
+                                        <Checkbox
+                                            checked={(this.state.statsOn === 'daily')}
+                                            value="daily"
+                                            name="statsOn"
+                                            style={{ color: '#ffffff' }}
+                                            onChange={this.handleCheckbox}
+                                        />
+                                    }
+                                />
+                                <FormControlLabel
+                                    label="Weekly"
+                                    labelPlacement="start"
+                                    control={
+                                        <Checkbox
+                                            checked={(this.state.statsOn === 'weekly')}
+                                            value="weekly"
+                                            name="statsOn"
+                                            style={{ color: '#ffffff' }}
+                                            onChange={this.handleCheckbox}
+                                        />
+                                    }
+                                />
+                                <FormControlLabel
+                                    label="Monthly"
+                                    labelPlacement="start"
+                                    control={
+                                        <Checkbox
+                                            checked={(this.state.statsOn === 'monthly')}
+                                            value="monthly"
+                                            name="statsOn"
+                                            style={{ color: '#ffffff' }}
+                                            onChange={this.handleCheckbox}
+                                        />
+                                    }
+                                />
+                            </FormGroup>
+                        </div>
+                        <div style={{ float: 'right', fontSize: '20px', paddingTop: '10px' }}>
+                            <span style={{ paddingRight: '20px' }}>Bitcoin&nbsp;${this.state.btcPrice}</span>
+                            <span style={{ marginRight: '20px' }}>Ethereum&nbsp;${this.state.ethPrice}</span>
+                        </div>
+                    </div>
                     <div className="navigator" style={{ width: '1500px', paddingBottom: '16px', height: '30px' }}>
                         <div style={{ float: 'left', paddingLeft: '15px' }}>
                             <span style={{ fontSize: '30px' }}>Transactions Summary</span>
-                        </div>
-                    </div>
-
-                    <div style={{ display: 'inline !important', color: '#ffffff' }}>
-                        <FormGroup style={{ display: 'inline', color: '#ffffff', float: 'left' }}>
-                            <FormControlLabel
-                                label="Daily"
-                                labelPlacement="start"
-                                control={
-                                    <Checkbox
-                                        checked={(this.state.statsOn === 'daily')}
-                                        value="daily"
-                                        name="statsOn"
-                                        style={{ color: '#ffffff' }}
-                                        onChange={this.handleCheckbox}
-                                    />
-                                }
-                            />
-                            <FormControlLabel
-                                label="Weekly"
-                                labelPlacement="start"
-                                control={
-                                    <Checkbox
-                                        checked={(this.state.statsOn === 'weekly')}
-                                        value="weekly"
-                                        name="statsOn"
-                                        style={{ color: '#ffffff' }}
-                                        onChange={this.handleCheckbox}
-                                    />
-                                }
-                            />
-                            <FormControlLabel
-                                label="Monthly"
-                                labelPlacement="start"
-                                control={
-                                    <Checkbox
-                                        checked={(this.state.statsOn === 'monthly')}
-                                        value="monthly"
-                                        name="statsOn"
-                                        style={{ color: '#ffffff' }}
-                                        onChange={this.handleCheckbox}
-                                    />
-                                }
-                            />
-                        </FormGroup>
-                        <div style={{ float: 'right', fontSize: '20px' }}>
-                            <span style={{ paddingRight: '20px' }}>Bitcoin&nbsp;${this.state.btcPrice}</span>
-                            <span style={{ marginRight: '20px' }}>Ethereum&nbsp;${this.state.ethPrice}</span>
                         </div>
                     </div>
                     <table style={{ width: '1500px', marginBottom: '20px' }}>
@@ -671,11 +672,12 @@ export default class MainDashboard extends Component {
                             </tr>
                         </tbody>
                     </table>
-                    <div className="navigator" style={{ width: '1500px', paddingBottom: '16px', height: '30px', marginBottom: '20px' }}>
+                    <div className="navigator" style={{ width: '1500px', paddingBottom: '16px', height: '30px'}}>
                         <div style={{ float: 'left', paddingLeft: '15px' }}>
                             <span style={{ fontSize: '30px' }}>Top Transactions</span>
                         </div>
                     </div>
+
                     <div style={{ display: 'flex' }}>
                         <div>
 
@@ -784,7 +786,7 @@ export default class MainDashboard extends Component {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         )
     }
 }
