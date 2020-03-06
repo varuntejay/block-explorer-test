@@ -69,9 +69,13 @@ router.post("/getBlockCount", async (req, res) => {
 
     const db = dbConnection.db('bitcoin_db');
 
-    db.collection('blocks').stats((err, result) => {
-        console.log(result.count)
-        res.send({ status: true, blocksHeight: result.count })
+    db.collection('blocks').find().project({ "height": 1 }).sort({ "height": -1 }).limit(1).toArray((err, result) => {
+        console.log("blocks", result)
+        res.send(
+            {
+                status: true,
+                blocksHeight: result[0].height
+            })
     })
 });
 
